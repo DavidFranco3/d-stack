@@ -58,10 +58,10 @@ src/
 
 ---
 
-## 🏗️ Requerimientos
+## 🏗️ Requirements
 
 - **Node.js**: v18+ 
-- **MongoDB**: Una instancia local o remota (MongoDB Atlas)
+- **MongoDB**: A local or remote instance (MongoDB Atlas)
 
 ---
 
