@@ -3,16 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>D-Stack Framework | Full-Stack Monolith por David Franco</title>
-  <meta name="description" content="D-Stack es un poderoso framework monolítico profesional para Express + React diseñado por David Franco. Tipo-seguro, ultrarrápido y listo para producción.">
+  <title>D-Stack Framework | Full-Stack Monolith by David Franco</title>
+  <meta name="description" content="D-Stack is a full-stack monolith framework for Express + React with CLI scaffolding, Zod validation, JWT auth, and MongoDB.">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,7 +18,6 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Ambient Glow Backgrounds -->
   <div class="bg-grid"></div>
   <div class="glow-orb glow-top-left"></div>
   <div class="glow-orb glow-bottom-right"></div>
@@ -37,16 +33,15 @@
       </div>
 
       <ul class="nav-links">
-        <li><a href="#prerequisites">Requisitos</a></li>
-        <li><a href="#features">Características</a></li>
-        <li><a href="#libraries">Librerías</a></li>
-        <li><a href="#terminal">Terminal Sim</a></li>
-        <li><a href="#cli-commands">Comandos CLI</a></li>
-        <li><a href="#docs">Inicio Rápido</a></li>
+        <li><a href="#prerequisites">Requirements</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#libraries">Libraries</a></li>
+        <li><a href="#terminal">Terminal</a></li>
+        <li><a href="#cli-commands">CLI</a></li>
+        <li><a href="#docs">Quick Start</a></li>
       </ul>
 
       <div class="nav-actions">
-        <a href="#docs" class="btn btn-secondary text-sm">Empieza Gratis</a>
         <a href="https://github.com/DavidFranco3/d-stack" target="_blank" rel="noopener" class="btn-icon" aria-label="GitHub Repository">
           <i data-lucide="github"></i>
         </a>
@@ -59,44 +54,43 @@
     <div class="hero-container">
       <div class="hero-badge">
         <span class="badge-dot"></span>
-        <span>Framework Monolítico Express + React por David Franco</span>
+        <span>Express + React Full-Stack Monolith</span>
       </div>
 
       <h1 class="hero-title">
-        Construye Aplicaciones Full-Stack a <span class="gradient-text">Velocidad Luz</span>
+        D-Stack <span class="gradient-text">Framework</span>
       </h1>
 
       <p class="hero-subtitle">
-        <strong>D-Stack</strong> une la velocidad de un prototipo con la solidez de una arquitectura limpia enterprise. Type-safe por defecto, validación Zod integrada, seguridad Helmet y soporte nativo para MongoDB.
+        CLI-driven monolith framework combining Express API, React 19 SPA, and MongoDB. Type-safe with Zod, JWT authentication, Helmet security, and CRUD scaffolding.
       </p>
 
       <div class="hero-actions">
         <div class="command-pill" id="installPill">
           <span class="command-text">$ npm link dstack</span>
-          <button class="btn-copy" id="copyInstallBtn" title="Copiar Comando">
+          <button class="btn-copy" id="copyInstallBtn" title="Copy Command">
             <i data-lucide="copy"></i>
           </button>
         </div>
 
         <a href="#cli-commands" class="btn btn-primary">
-          <span>Ver Comandos CLI</span>
+          <span>CLI Reference</span>
           <i data-lucide="arrow-right"></i>
         </a>
       </div>
 
-      <!-- Quick Metrics -->
       <div class="hero-stats">
         <div class="stat-card">
           <span class="stat-number">100%</span>
-          <span class="stat-label">TypeScript & JS Parity</span>
+          <span class="stat-label">TS & JS Parity</span>
         </div>
         <div class="stat-card">
           <span class="stat-number">&lt; 1s</span>
-          <span class="stat-label">Scaffolding de Recursos</span>
+          <span class="stat-label">Resource Scaffolding</span>
         </div>
         <div class="stat-card">
           <span class="stat-number">3</span>
-          <span class="stat-label">Librerías npm Nativas</span>
+          <span class="stat-label">npm Libraries</span>
         </div>
       </div>
     </div>
@@ -106,8 +100,8 @@
   <section class="section req-section" id="prerequisites">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Requisitos Previos del Sistema</h2>
-        <p class="section-subtitle">Asegúrate de contar con estas herramientas instaladas en tu entorno antes de comenzar.</p>
+        <h2 class="section-title">System Requirements</h2>
+        <p class="section-subtitle">Required tools for local development.</p>
       </div>
 
       <div class="req-grid">
@@ -116,8 +110,8 @@
             <i data-lucide="server"></i>
           </div>
           <h3 class="req-title">Node.js (>= v18.0.0)</h3>
-          <p class="req-desc">Requerido para ejecutar el entorno de backend Express y los scripts de scaffolding de Vite.</p>
-          <div class="req-code"><code>node -v  # v18+, v20+ o v24+ LTS</code></div>
+          <p class="req-desc">Runtime for the Express backend and Vite dev server.</p>
+          <div class="req-code"><code>node -v  # v18+, v20+ or v24+ LTS</code></div>
         </div>
 
         <div class="req-card">
@@ -125,7 +119,7 @@
             <i data-lucide="database"></i>
           </div>
           <h3 class="req-title">MongoDB Service</h3>
-          <p class="req-desc">Servicio local activo en puerto <code>27017</code>. Se conectará automáticamente a <code>dstack-db</code>.</p>
+          <p class="req-desc">Local service on port <code>27017</code>. Connects to database <code>dstack-db</code>.</p>
           <div class="req-code"><code>mongod  # mongodb://127.0.0.1:27017/dstack-db</code></div>
         </div>
 
@@ -134,23 +128,22 @@
             <i data-lucide="package"></i>
           </div>
           <h3 class="req-title">npm (>= v9.0.0)</h3>
-          <p class="req-desc">Gestor de paquetes predeterminado para la instalación del CLI global <code>dstack</code> y dependencias.</p>
-          <div class="req-code"><code>npm -v  # v9+ o v10+</code></div>
+          <p class="req-desc">Package manager for CLI and project dependencies.</p>
+          <div class="req-code"><code>npm -v  # v9+ or v10+</code></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Ecosystem Libraries Section by David Franco -->
+  <!-- Libraries Section -->
   <section class="section eco-section" id="libraries">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Ecosistema de Librerías Nativas</h2>
-        <p class="section-subtitle">D-Stack integra tres poderosas librerías publicadas por David Franco para impulsar tu flujo de trabajo.</p>
+        <h2 class="section-title">Bundled npm Packages</h2>
+        <p class="section-subtitle">Three npm packages by the same author, pre-integrated in the stack.</p>
       </div>
 
       <div class="libraries-grid">
-        <!-- Package 1: fluent-rest-client -->
         <div class="lib-card">
           <div class="lib-header">
             <div class="lib-badge">npm package</div>
@@ -158,20 +151,19 @@
             <span class="lib-version">v1.0.0</span>
           </div>
           <p class="lib-desc">
-            Cliente HTTP fluido y ligero para Node.js y React. Proporciona interfaz encadenable builder pattern, gestión transparente de JWT y respuesta tipada.
+            Chainable HTTP client for Node.js and React with builder pattern, JWT token management, and typed responses.
           </p>
           <div class="code-block">
             <code>api.resource('resources').safe().get()</code>
           </div>
           <div class="lib-footer">
             <a href="https://www.npmjs.com/package/fluent-rest-client" target="_blank" rel="noopener" class="btn btn-secondary text-xs">
-              <span>Ver en npm</span>
+              <span>npm</span>
               <i data-lucide="external-link"></i>
             </a>
           </div>
         </div>
 
-        <!-- Package 2: react-apextable-pro -->
         <div class="lib-card highlight-lib">
           <div class="lib-header">
             <div class="lib-badge badge-pro">npm package</div>
@@ -179,20 +171,19 @@
             <span class="lib-version">v1.0.3</span>
           </div>
           <p class="lib-desc">
-            Grilla de datos profesional para React 19 y Vite 8 de alto rendimiento con soporte para persistencia en LocalStorage, columnas sticky, ordenamiento y exportaciones (CSV, PDF).
+            Data table component for React 19 with LocalStorage persistence, sticky columns, sorting, and CSV/PDF export.
           </p>
           <div class="code-block">
             <code>&lt;ApexTable datos={items} columnas={cols} /&gt;</code>
           </div>
           <div class="lib-footer">
             <a href="https://www.npmjs.com/package/react-apextable-pro" target="_blank" rel="noopener" class="btn btn-primary text-xs">
-              <span>Ver en npm</span>
+              <span>npm</span>
               <i data-lucide="external-link"></i>
             </a>
           </div>
         </div>
 
-        <!-- Package 3: intl-currency-helper -->
         <div class="lib-card">
           <div class="lib-header">
             <div class="lib-badge">npm package</div>
@@ -200,14 +191,14 @@
             <span class="lib-version">v2.0.0</span>
           </div>
           <p class="lib-desc">
-            Librería ultra ligera para formatear valores numéricos a moneda internacional usando <code>Intl.NumberFormat</code> nativo optimizado para Node.js y React.
+            Currency formatting utility based on <code>Intl.NumberFormat</code>, zero dependencies.
           </p>
           <div class="code-block">
             <code>formatCurrency(1250.50, { currency: 'USD' })</code>
           </div>
           <div class="lib-footer">
             <a href="https://www.npmjs.com/package/intl-currency-helper" target="_blank" rel="noopener" class="btn btn-secondary text-xs">
-              <span>Ver en npm</span>
+              <span>npm</span>
               <i data-lucide="external-link"></i>
             </a>
           </div>
@@ -220,8 +211,8 @@
   <section class="section terminal-section" id="terminal">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">CLI Interactive Terminal</h2>
-        <p class="section-subtitle">Simula los comandos de D-Stack en tiempo real y observa cómo se scaffolden tus archivos.</p>
+        <h2 class="section-title">CLI Terminal Simulator</h2>
+        <p class="section-subtitle">Interactive demo of dstack commands and their output.</p>
       </div>
 
       <div class="terminal-container">
@@ -241,28 +232,26 @@
         </div>
 
         <div class="terminal-body" id="terminalScreen">
-          <!-- Populated by JS -->
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TABBED CLI COMMAND REFERENCE HUB SECTION -->
+  <!-- CLI Command Reference -->
   <section class="section cli-docs-section" id="cli-commands">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Documentación de Comandos CLI</h2>
-        <p class="section-subtitle">Explora los comandos del CLI con una interfaz limpia, sin espacios vacíos ni desproporciones.</p>
+        <h2 class="section-title">CLI Command Reference</h2>
+        <p class="section-subtitle">All available commands and options.</p>
       </div>
 
       <div class="cli-hub-wrapper">
-        <!-- Command Selector Sidebar -->
         <div class="cli-hub-sidebar">
           <button class="cli-hub-tab active" data-cmd="init">
             <div class="tab-icon icon-blue"><i data-lucide="folder-plus"></i></div>
             <div class="tab-info">
               <span class="tab-cmd">dstack init</span>
-              <span class="tab-desc">Crear nuevo monolito</span>
+              <span class="tab-desc">Scaffold a project</span>
             </div>
           </button>
 
@@ -270,7 +259,7 @@
             <div class="tab-icon icon-green"><i data-lucide="zap"></i></div>
             <div class="tab-info">
               <span class="tab-cmd">dstack g resource</span>
-              <span class="tab-desc">Scaffold CRUD completo</span>
+              <span class="tab-desc">Generate CRUD module</span>
             </div>
           </button>
 
@@ -278,7 +267,7 @@
             <div class="tab-icon icon-purple"><i data-lucide="activity"></i></div>
             <div class="tab-info">
               <span class="tab-cmd">dstack doctor</span>
-              <span class="tab-desc">Diagnóstico de salud</span>
+              <span class="tab-desc">System diagnostics</span>
             </div>
           </button>
 
@@ -286,14 +275,12 @@
             <div class="tab-icon icon-amber"><i data-lucide="help-circle"></i></div>
             <div class="tab-info">
               <span class="tab-cmd">dstack --help</span>
-              <span class="tab-desc">Opciones y versión</span>
+              <span class="tab-desc">Usage & options</span>
             </div>
           </button>
         </div>
 
-        <!-- Command Detail Display Pane -->
         <div class="cli-hub-pane" id="cliHubPane">
-          <!-- Populated by JS -->
         </div>
       </div>
     </div>
@@ -303,8 +290,8 @@
   <section class="section features-section" id="features">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Diseñado para la Excelencia</h2>
-        <p class="section-subtitle">Todo lo que necesitas para construir monolitos modernos listos para producción.</p>
+        <h2 class="section-title">Architecture & Features</h2>
+        <p class="section-subtitle">Key characteristics of the framework.</p>
       </div>
 
       <div class="features-grid">
@@ -312,8 +299,8 @@
           <div class="feature-icon icon-blue">
             <i data-lucide="layers"></i>
           </div>
-          <h3 class="feature-title">Arquitectura por Capas</h3>
-          <p class="feature-desc">Separación limpia y desacoplada entre Rutas (Routes), Controladores (Controllers), Servicios (Services) y Modelos (Models).</p>
+          <h3 class="feature-title">Layered Architecture</h3>
+          <p class="feature-desc">Separation between routes, controllers, services, and models. Each layer has a single responsibility.</p>
         </div>
 
         <div class="feature-card">
@@ -321,58 +308,58 @@
             <i data-lucide="code-2"></i>
           </div>
           <h3 class="feature-title">TypeScript & JavaScript</h3>
-          <p class="feature-desc">Soporte nativo y completo para TypeScript o JavaScript moderno según las preferencias de tu equipo.</p>
+          <p class="feature-desc">Full support for both languages. Choose TS for type safety or JS for faster prototyping.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon icon-green">
             <i data-lucide="check-circle-2"></i>
           </div>
-          <h3 class="feature-title">Validación con Zod</h3>
-          <p class="feature-desc">Middleware listo para usar que valida esquemas de cuerpo, parámetros y consultas HTTP devolviendo errores estandarizados.</p>
+          <h3 class="feature-title">Zod Validation</h3>
+          <p class="feature-desc">Request body, query, and params validation middleware with standard error responses.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon icon-amber">
             <i data-lucide="shield-check"></i>
           </div>
-          <h3 class="feature-title">Seguridad Out-of-the-Box</h3>
-          <p class="feature-desc">Encabezados de protección HTTP con <strong>Helmet</strong> y protección contra abusos con <strong>Express Rate Limiting</strong>.</p>
+          <h3 class="feature-title">Security</h3>
+          <p class="feature-desc">Helmet HTTP headers, rate limiting, JWT authentication middleware included by default.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon icon-pink">
             <i data-lucide="zap"></i>
           </div>
-          <h3 class="feature-title">Generador de Recursos</h3>
-          <p class="feature-desc">Scaffold un módulo completo CRUD en 1 segundo con <code>dstack g resource &lt;Name&gt;</code>. Genera modelo, servicio, controlador y ruta.</p>
+          <h3 class="feature-title">CRUD Generator</h3>
+          <p class="feature-desc"><code>dstack g resource &lt;Name&gt;</code> generates model, service, controller, routes, and a React page with data table.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon icon-cyan">
             <i data-lucide="globe"></i>
           </div>
-          <h3 class="feature-title">Fluent REST Client</h3>
-          <p class="feature-desc">Cliente HTTP fluído preconfigurado en el Frontend con <strong>fluent-rest-client</strong> para peticiones type-safe y gestión automática de tokens.</p>
+          <h3 class="feature-title">fluent-rest-client</h3>
+          <p class="feature-desc">Pre-configured HTTP client in the frontend with JWT token handling.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Quick Start & Docs Section -->
+  <!-- Quick Start Section -->
   <section class="section docs-section" id="docs">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Guía de Inicio Rápido</h2>
-        <p class="section-subtitle">Comienza en 3 sencillos pasos.</p>
+        <h2 class="section-title">Quick Start</h2>
+        <p class="section-subtitle">Get a project running in 3 steps.</p>
       </div>
 
       <div class="steps-wrapper" id="quickstart">
         <div class="step-item">
           <div class="step-number">1</div>
           <div class="step-content">
-            <h3>Instalar CLI Globalmente</h3>
-            <p>Instala dstack directamente desde npm:</p>
+            <h3>Install the CLI</h3>
+            <p>Clone the repo and link the CLI globally:</p>
             <div class="code-block">
               <code>npm link dstack</code>
             </div>
@@ -382,10 +369,10 @@
         <div class="step-item">
           <div class="step-number">2</div>
           <div class="step-content">
-            <h3>Crear un Proyecto Monolítico</h3>
-            <p>Genera la estructura de backend API (Express + Mongo) y frontend React (Vite):</p>
+            <h3>Scaffold a Project</h3>
+            <p>Generate the full-stack structure with Express API and React frontend:</p>
             <div class="code-block">
-              <code>dstack init mi-gran-app</code>
+              <code>dstack init my-app -t ts</code>
             </div>
           </div>
         </div>
@@ -393,10 +380,10 @@
         <div class="step-item">
           <div class="step-number">3</div>
           <div class="step-content">
-            <h3>Scaffold de Componentes & Iniciar</h3>
-            <p>Genera recursos completos y corre el servidor de desarrollo en simultáneo:</p>
+            <h3>Generate Resources & Run</h3>
+            <p>Create CRUD modules and start the development servers:</p>
             <div class="code-block">
-              <code>cd mi-gran-app<br>dstack g resource Product<br>npm run dev</code>
+              <code>cd my-app<br>dstack g resource Product<br>npm run dev</code>
             </div>
           </div>
         </div>
@@ -412,16 +399,15 @@
           <div class="brand-icon"><i data-lucide="rocket"></i></div>
           <span class="brand-name">D-Stack Framework</span>
         </div>
-        <p class="footer-desc">El framework monolítico profesional para Express y React creado por <strong>David Franco</strong>.</p>
+        <p class="footer-desc">Full-stack monolith framework by <strong>David Franco</strong>.</p>
       </div>
 
       <div class="footer-links">
-        <p>© 2026 David Franco. Todos los derechos reservados.</p>
+        <p>&copy; 2026 David Franco. ISC License.</p>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,12 +1,9 @@
-// D-Stack Official Landing Page Interactive JavaScript
-
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Lucide Icons
   if (window.lucide) {
     lucide.createIcons();
   }
 
-  // Terminal Simulator State & Logs
+  // Terminal Simulator
   const terminalScreen = document.getElementById('terminalScreen');
   const termBtns = document.querySelectorAll('.term-btn');
 
@@ -21,16 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
   <span class="t-cyan">| |__| |      ____) | || (_| | (__|   <  </span>
   <span class="t-cyan">|_____/      |_____/ \\__\\__,_|\\___|_|\\_\\ </span>
 
-  <span class="t-gray">Full-Stack Monolith Framework by David Franco (Express + React)</span>
+  <span class="t-gray">D-Stack CLI - Express + React Monolith Framework</span>
 
-? Select language: <span class="t-green">TypeScript (Recommended)</span>
+? Select language: <span class="t-green">TypeScript</span>
 ? Would you like to install dependencies automatically? <span class="t-green">Yes</span>
 
-<span class="t-cyan">🚀 Initializing my-awesome-app in TypeScript...</span>
-<span class="t-cyan">📦 Installing dependencies for API and Web...</span>
+<span class="t-cyan">Initializing my-awesome-app in TypeScript...</span>
+<span class="t-cyan">Installing dependencies for API and Web...</span>
 
-<span class="t-green">✅ Dependencies installed successfully!</span>
-<span class="t-green">🎉 Project my-awesome-app created successfully!</span>
+<span class="t-green">Dependencies installed successfully!</span>
+<span class="t-green">Project my-awesome-app created successfully!</span>
 
 <span class="t-yellow">Next steps:</span>
   cd my-awesome-app
@@ -40,19 +37,19 @@ document.addEventListener('DOMContentLoaded', () => {
     resource: `
 <span class="t-cyan">$ dstack g resource Product</span>
 
-<span class="t-cyan">⚡ Scaffolding resource "Product"...</span>
+<span class="t-cyan">Scaffolding resource "Product"...</span>
 
-<span class="t-green">✅ Created model: api/src/models/Product.ts</span>
-<span class="t-green">✅ Created service: api/src/services/productService.ts</span>
-<span class="t-green">✅ Created controller: api/src/controllers/productController.ts</span>
-<span class="t-green">✅ Created route: api/src/routes/productRoutes.ts</span>
-<span class="t-green">✅ Created page: web/src/pages/ProductPage.tsx</span>
+<span class="t-green">Created model: api/src/models/Product.ts</span>
+<span class="t-green">Created service: api/src/services/productService.ts</span>
+<span class="t-green">Created controller: api/src/controllers/productController.ts</span>
+<span class="t-green">Created route: api/src/routes/productRoutes.ts</span>
+<span class="t-green">Created page: web/src/pages/ProductPage.tsx</span>
 
-<span class="t-magenta">💡 Don't forget to mount your new route in server.ts:</span>
+<span class="t-magenta">Mount the route in server.ts:</span>
    <span class="t-gray">import productRoutes from './routes/productRoutes.js';</span>
    <span class="t-gray">app.use('/api/products', productRoutes);</span>
 
-<span class="t-magenta">💡 Then add the page to your router in App.tsx:</span>
+<span class="t-magenta">Add the page to your router in App.tsx:</span>
    <span class="t-gray">import ProductPage from './pages/ProductPage';</span>
    <span class="t-gray">&lt;Route path="/products" element={&lt;ProductPage /&gt;} /&gt;</span>
     `,
@@ -67,15 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
   <span class="t-cyan">| |__| |      ____) | || (_| | (__|   <  </span>
   <span class="t-cyan">|_____/      |_____/ \\__\\__,_|\\___|_|\\_\\ </span>
 
-🩺 Running D-Stack System Diagnostic...
+D-Stack System Diagnostic...
 
-  <span class="t-green">✅ Node.js Version: v20.11.0 (>= 18.0.0)</span>
-  <span class="t-green">✅ npm Version: 10.2.4 (>= 9.0.0)</span>
-  <span class="t-green">✅ Workspace: D-Stack App detected</span>
-  <span class="t-gray">🔍 Checking local MongoDB service (localhost:27017)...</span>
-  <span class="t-green">✅ MongoDB: Service detected running on port 27017</span>
+  <span class="t-green">Node.js Version: v20.11.0 (>= 18.0.0)</span>
+  <span class="t-green">npm Version: 10.2.4 (>= 9.0.0)</span>
+  <span class="t-green">Workspace: D-Stack App detected</span>
+  <span class="t-gray">Checking local MongoDB service (localhost:27017)...</span>
+  <span class="t-green">MongoDB: Service detected running on port 27017</span>
 
-<span class="t-cyan">✨ Diagnostic completed with 0 errors!</span>
+<span class="t-cyan">Diagnostic completed with 0 errors!</span>
     `,
 
     help: `
@@ -90,14 +87,13 @@ Options:
   <span class="t-yellow">-h, --help</span>                   display help for command
 
 Commands:
-  <span class="t-green">init [options] [name]</span>        Initialize a new D-Stack project (monolith)
+  <span class="t-green">init [options] [name]</span>        Initialize a new D-Stack project
   <span class="t-green">generate|g &lt;type&gt; &lt;name&gt;</span>     Generate components or full CRUD resources
-  <span class="t-green">doctor</span>                       Run system and workspace health diagnostics
+  <span class="t-green">doctor</span>                       Run system diagnostics
   <span class="t-green">help [command]</span>               Display help for command
     `
   };
 
-  // Color Styles for Terminal
   const style = document.createElement('style');
   style.innerHTML = `
     .t-cyan { color: #38bdf8; font-weight: 600; }
@@ -108,16 +104,13 @@ Commands:
   `;
   document.head.appendChild(style);
 
-  // Simulated Command Function
   window.runSimulatedCommand = (cmdKey) => {
     termBtns.forEach(btn => btn.classList.remove('active'));
     const targetBtn = Array.from(termBtns).find(b => b.getAttribute('onclick')?.includes(cmdKey));
     if (targetBtn) targetBtn.classList.add('active');
-
     terminalScreen.innerHTML = simulatedLogs[cmdKey] || '';
   };
 
-  // Initialize with 'resource' command log
   runSimulatedCommand('resource');
 
   // Copy Install Command Button
@@ -135,114 +128,114 @@ Commands:
     });
   }
 
-  // CLI Reference Hub Tab Switcher
+  // CLI Reference Hub
   const cliHubPane = document.getElementById('cliHubPane');
   const cliHubTabs = document.querySelectorAll('.cli-hub-tab');
 
   const cliHubContent = {
     init: `
       <div class="cmd-header">
-        <div class="cmd-tag">Inicialización Monolítica</div>
-        <h3 class="cmd-title"><code>dstack init [nombre-proyecto]</code></h3>
+        <div class="cmd-tag">Project Initialization</div>
+        <h3 class="cmd-title"><code>dstack init [project-name]</code></h3>
       </div>
       <p class="cmd-desc">
-        Crea la estructura de carpetas de un nuevo proyecto monolítico D-Stack con Express + MongoDB Mongoose en el backend y Vite + React 19 + Tailwind CSS en el frontend.
+        Creates a new D-Stack project with Express + Mongoose backend and Vite + React 19 + Tailwind CSS frontend.
       </p>
 
       <div class="cmd-details">
-        <div class="cmd-subtitle">Argumentos & Opciones:</div>
+        <div class="cmd-subtitle">Arguments & Options:</div>
         <ul class="cmd-list">
-          <li><code>[nombre-proyecto]</code> (Opcional): Nombre del directorio y del paquete en <code>package.json</code>. Si se omite, la CLI lo solicitará interactivamente.</li>
-          <li><code>-t, --template &lt;ts|js&gt;</code>: Especifica el lenguaje (TypeScript o JavaScript) sin desplegar menús.</li>
+          <li><code>[project-name]</code> (optional): Directory and package name. Prompts if omitted.</li>
+          <li><code>-t, --template &lt;ts|js&gt;</code>: Language selection for non-interactive mode.</li>
         </ul>
 
-        <div class="cmd-subtitle">Ejemplo de Uso:</div>
+        <div class="cmd-subtitle">Examples:</div>
         <div class="code-block">
-          <code># Modo interactivo<br>dstack init mi-tienda-online<br><br># Modo directo con TypeScript<br>dstack init mi-tienda-online -t ts</code>
+          <code># Interactive<br>dstack init my-app<br><br># Non-interactive with TypeScript<br>dstack init my-app -t ts</code>
         </div>
 
-        <div class="cmd-subtitle">Estructura Generada:</div>
-        <div class="cmd-tree">mi-tienda-online/
-├── api/                   # Backend Express + Node.js
-│   ├── src/config/        # Conexión MongoDB y Seeder
-│   ├── src/controllers/   # Controladores HTTP
-│   ├── src/middleware/    # Helmet, RateLimit, Zod, Logger
-│   ├── src/models/        # Modelos Mongoose (User, Resource)
-│   └── src/routes/        # Rutas REST Auth y Resources
-├── web/                   # Frontend Vite + React 19
-│   ├── src/api/           # Cliente fluent-rest-client
-│   ├── src/components/    # ApexTable, AppLayout, Navbar
-│   └── src/pages/         # Dashboard, ResourcesPage, Users
-└── shared/                # Tipos e Interfaces compartidas TS</div>
+        <div class="cmd-subtitle">Generated Structure:</div>
+        <div class="cmd-tree">my-app/
+├── api/                   # Express backend
+│   ├── src/config/        # MongoDB connection & seeder
+│   ├── src/controllers/   # HTTP handlers
+│   ├── src/middleware/     # Helmet, rate-limit, Zod, logger
+│   ├── src/models/        # Mongoose schemas
+│   └── src/routes/        # REST routes
+├── web/                   # React SPA
+│   ├── src/api/           # HTTP client
+│   ├── src/components/    # Shared components
+│   └── src/pages/         # Route pages
+└── shared/                # Shared TypeScript types</div>
       </div>
     `,
 
     resource: `
       <div class="cmd-header">
-        <div class="cmd-tag tag-pro">Scaffolding CRUD</div>
-        <h3 class="cmd-title"><code>dstack g resource &lt;Nombre&gt;</code></h3>
+        <div class="cmd-tag tag-pro">CRUD Scaffolding</div>
+        <h3 class="cmd-title"><code>dstack g resource &lt;Name&gt;</code></h3>
       </div>
       <p class="cmd-desc">
-        Genera un recurso CRUD completo en menos de 1 segundo. Crea el modelo Mongoose, servicio, controlador Express, rutas con validación Zod y la página Web en React con ApexTable Pro.
+        Generates a complete CRUD module: Mongoose model, service, controller, routes with Zod validation, and a React page with ApexTable.
       </p>
 
       <div class="cmd-details">
-        <div class="cmd-subtitle">Alias y Comandos Equivalentes:</div>
+        <div class="cmd-subtitle">Aliases:</div>
         <ul class="cmd-list">
-          <li><code>dstack generate resource &lt;Nombre&gt;</code></li>
-          <li><code>dstack g resource &lt;Nombre&gt;</code></li>
+          <li><code>dstack generate resource &lt;Name&gt;</code></li>
+          <li><code>dstack g resource &lt;Name&gt;</code></li>
         </ul>
 
-        <div class="cmd-subtitle">Ejemplo de Uso:</div>
+        <div class="cmd-subtitle">Examples:</div>
         <div class="code-block">
-          <code># Generar recurso 'Product'<br>dstack g resource Product<br><br># Generar recurso 'Invoice'<br>dstack g resource Invoice</code>
+          <code>dstack g resource Product<br>dstack g resource Invoice</code>
         </div>
 
-        <div class="cmd-subtitle">Módulos Creados en un solo paso:</div>
-        <div class="cmd-tree">1. Backend Model:     api/src/models/Product.ts
-2. Backend Service:   api/src/services/productService.ts
-3. Backend Controller: api/src/controllers/productController.ts
-4. Backend Routes:    api/src/routes/productRoutes.ts
-5. Frontend Page:      web/src/pages/ProductsPage.tsx</div>
+        <div class="cmd-subtitle">Files Created:</div>
+        <div class="cmd-tree">1. Model:      api/src/models/Product.ts
+2. Service:    api/src/services/productService.ts
+3. Controller: api/src/controllers/productController.ts
+4. Routes:     api/src/routes/productRoutes.ts
+5. Page:       web/src/pages/ProductPage.tsx</div>
       </div>
     `,
 
     doctor: `
       <div class="cmd-header">
-        <div class="cmd-tag">Diagnóstico de Entorno</div>
+        <div class="cmd-tag">System Diagnostics</div>
         <h3 class="cmd-title"><code>dstack doctor</code></h3>
       </div>
       <p class="cmd-desc">
-        Ejecuta un diagnóstico del entorno de trabajo comprobando la versión de Node.js, npm, conectividad con la base de datos MongoDB local (puerto 27017) y la estructura del proyecto.
+        Checks Node.js version, npm version, MongoDB connectivity (port 27017), and project structure validity.
       </p>
 
       <div class="cmd-details">
-        <div class="cmd-subtitle">Ejemplo de Uso:</div>
+        <div class="cmd-subtitle">Example:</div>
         <div class="code-block">
           <code>dstack doctor</code>
         </div>
 
-        <div class="cmd-subtitle">Salida del Diagnóstico:</div>
-        <div class="cmd-tree">[✔] Node.js Version: v20.11.0 (>= 18.0.0)
-[✔] npm Version: 10.2.4 (>= 9.0.0)
-[✔] MongoDB Connection: OK (mongodb://127.0.0.1:27017)
-[✔] Monolith Structure: Valid (api, web, shared directories found)</div>
+        <div class="cmd-subtitle">Sample Output:</div>
+        <div class="cmd-tree">[OK] Node.js Version: v20.11.0 (>= 18.0.0)
+[OK] npm Version: 10.2.4 (>= 9.0.0)
+[OK] MongoDB Connection: OK (mongodb://127.0.0.1:27017)
+[OK] Monolith Structure: Valid (api, web, shared)</div>
       </div>
     `,
 
     help: `
       <div class="cmd-header">
-        <div class="cmd-tag">Utilidades & Ayuda</div>
+        <div class="cmd-tag">Utility Commands</div>
         <h3 class="cmd-title"><code>dstack --version | --help</code></h3>
       </div>
       <p class="cmd-desc">
-        Comandos de información general para consultar la versión instalada del CLI o desplegar el menú de ayuda interactivo.
+        Display version information or the full help menu with all available commands and options.
       </p>
 
       <div class="cmd-details">
-        <div class="cmd-subtitle">Ejemplos de Uso:</div>
+        <div class="cmd-subtitle">Examples:</div>
         <div class="code-block">
-          <code>dstack --version   # Muestra la versión actual (ej. 1.0.0)<br>dstack --help      # Muestra todas las opciones disponibles</code>
+          <code>dstack --version   # Shows version (e.g. 1.0.0)<br>dstack --help      # Shows all commands and options</code>
         </div>
       </div>
     `
@@ -266,46 +259,5 @@ Commands:
     });
   });
 
-  // Initialize with 'init' tab
   setCliHubTab('init');
-
-  // Architecture Nodes Hover Effect
-  const archNodes = document.querySelectorAll('.arch-node');
-  const archInfoTitle = document.getElementById('archInfoTitle');
-  const archInfoDesc = document.getElementById('archInfoDesc');
-
-  const archDetails = {
-    'info-client': {
-      title: 'React Client (Frontend SPA)',
-      desc: 'Capa visual construida con React 19 + Vite 8 + Tailwind CSS. Realiza solicitudes HTTP asíncronas con fluent-rest-client.'
-    },
-    'info-routes': {
-      title: 'Express Routes Layer',
-      desc: 'Mapea las URLs de los endpoints a sus correspondientes métodos de controlador. Integra los esquemas de validación Zod.'
-    },
-    'info-zod': {
-      title: 'Middleware de Validación Zod',
-      desc: 'Intercepta las peticiones y verifica que el body, params y query cumplan estrictamente con las reglas del esquema antes de pasar al controlador.'
-    },
-    'info-controller': {
-      title: 'Controller Layer (HTTP Handler)',
-      desc: 'Procesa req y res. No contiene lógica directa de base de datos; invoca los métodos estáticos del Service y responde con JSON.'
-    },
-    'info-service': {
-      title: 'Service & Model Layer (DB Logic)',
-      desc: 'Contiene la lógica pura de negocio y las consultas Mongoose a la base de datos MongoDB. Desacoplado totalmente de Express req/res.'
-    }
-  };
-
-  archNodes.forEach(node => {
-    node.addEventListener('mouseenter', () => {
-      archNodes.forEach(n => n.classList.remove('active'));
-      node.classList.add('active');
-      const target = node.getAttribute('data-target');
-      if (target && archDetails[target]) {
-        archInfoTitle.textContent = archDetails[target].title;
-        archInfoDesc.textContent = archDetails[target].desc;
-      }
-    });
-  });
 });
