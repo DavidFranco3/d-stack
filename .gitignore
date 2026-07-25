@@ -21,7 +21,7 @@ Thumbs.db
 # Project specific
 mi-dstack-demo/
 test-*/
-test-gravity-app-final/
+test-dstack-api-final/
 tsc_output.txt
 tsc_output_2.txt
 /tmp/
