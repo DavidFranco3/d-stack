@@ -46,10 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
 <span class="t-green">✅ Created service: api/src/services/productService.ts</span>
 <span class="t-green">✅ Created controller: api/src/controllers/productController.ts</span>
 <span class="t-green">✅ Created route: api/src/routes/productRoutes.ts</span>
-<span class="t-green">✅ Created web page: web/src/pages/ProductsPage.tsx</span>
+<span class="t-green">✅ Created page: web/src/pages/ProductPage.tsx</span>
 
-<span class="t-magenta">💡 Route registered and mounted automatically!</span>
+<span class="t-magenta">💡 Don't forget to mount your new route in server.ts:</span>
+   <span class="t-gray">import productRoutes from './routes/productRoutes.js';</span>
    <span class="t-gray">app.use('/api/products', productRoutes);</span>
+
+<span class="t-magenta">💡 Then add the page to your router in App.tsx:</span>
+   <span class="t-gray">import ProductPage from './pages/ProductPage';</span>
+   <span class="t-gray">&lt;Route path="/products" element={&lt;ProductPage /&gt;} /&gt;</span>
     `,
 
     doctor: `
@@ -119,7 +124,7 @@ Commands:
   const copyInstallBtn = document.getElementById('copyInstallBtn');
   if (copyInstallBtn) {
     copyInstallBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText('npm install -g dstack');
+      navigator.clipboard.writeText('npm link dstack');
       const originalHTML = copyInstallBtn.innerHTML;
       copyInstallBtn.innerHTML = '<i data-lucide="check" style="color:#10b981;"></i>';
       if (window.lucide) lucide.createIcons();
