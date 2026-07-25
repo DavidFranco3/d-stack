@@ -7,10 +7,8 @@ export interface IResource extends Document {
   category: string;
   price: number;
   currency: string;
-  status: number; // 1 = Active, 0 = Logical Soft Delete
+  status: number; // 1 = Active, 0 = Soft Deleted
   date: string;
-  isDeleted: boolean;
-  deletedAt?: Date;
 }
 
 const ResourceSchema: Schema = new Schema({

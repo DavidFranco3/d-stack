@@ -67,6 +67,8 @@ if (process.env.NODE_ENV === 'production') {
 // Global Error Handler (Must be last)
 app.use(errorHandler);
 
+export { app };
+
 app.listen(PORT, () => {
   logger.info(`🚀 TS Server running on http://localhost:${PORT}`);
 });

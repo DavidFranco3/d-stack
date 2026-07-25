@@ -47,6 +47,8 @@ cd /home/david/development/d-stack
 npm link
 ```
 
+> **Nota:** El CLI `dstack` no está publicado en npm. Debes usar `npm link` desde el repositorio clonado.
+
 ### 2. Initialize a Project
 Scaffold a full-stack monolith application (Express API Backend + React 19 Frontend Web):
 
@@ -81,6 +83,9 @@ dstack init my-app -t ts
 
 # Non-interactive mode with JavaScript
 dstack init my-app -t js
+
+# Non-interactive mode without name (prompts only for name)
+dstack init -t ts
 ```
 
 ---

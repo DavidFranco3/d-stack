@@ -8,8 +8,6 @@ export interface IUser extends Document {
   name: string;
   role: string;
   status: number; // 1 = Active, 0 = Soft Deleted
-  isDeleted: boolean;
-  deletedAt?: Date;
   comparePassword(password: string): Promise<boolean>;
 }
 

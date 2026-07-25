@@ -36,8 +36,23 @@ program
   .command('init')
   .description('Initialize a new D-Stack project')
   .argument('[name]', 'Project name')
-  .action(async (name) => {
+  .option('-t, --template <type>', 'Language template: ts (TypeScript) or js (JavaScript)')
+  .action(async (name, options) => {
     showBanner();
+
+    let language = null;
+    if (options.template) {
+      const normalized = options.template.toLowerCase();
+      if (normalized === 'ts' || normalized === 'typescript') {
+        language = 'TypeScript';
+      } else if (normalized === 'js' || normalized === 'javascript') {
+        language = 'JavaScript';
+      } else {
+        console.error(chalk.red(`❌ Invalid template "${options.template}". Use "ts" for TypeScript or "js" for JavaScript.`));
+        process.exit(1);
+      }
+    }
+
     const questions = [];
 
     if (!name) {
@@ -50,15 +65,17 @@ program
       });
     }
 
-    questions.push({
-      type: 'list',
-      name: 'language',
-      message: 'Select language:',
-      choices: [
-        { name: 'TypeScript (Recommended)', value: 'TypeScript' },
-        { name: 'JavaScript', value: 'JavaScript' },
-      ],
-    });
+    if (!language) {
+      questions.push({
+        type: 'list',
+        name: 'language',
+        message: 'Select language:',
+        choices: [
+          { name: 'TypeScript (Recommended)', value: 'TypeScript' },
+          { name: 'JavaScript', value: 'JavaScript' },
+        ],
+      });
+    }
 
     questions.push({
       type: 'confirm',
@@ -67,15 +84,16 @@ program
       default: true,
     });
 
-    const answers = await inquirer.prompt(questions);
+    const answers = questions.length > 0 ? await inquirer.prompt(questions) : {};
     const projectName = name || answers.projectName;
-    const isTS = answers.language === 'TypeScript';
+    const effectiveLanguage = language || answers.language;
+    const isTS = effectiveLanguage === 'TypeScript';
     const languageFolder = isTS ? 'ts' : 'js';
 
     const targetPath = path.join(process.cwd(), projectName);
     const templatePath = path.join(__dirname, '../templates', languageFolder);
 
-    console.log(chalk.cyan(`\n🚀 Initializing ${chalk.bold(projectName)} in ${chalk.yellow(answers.language)}...\n`));
+    console.log(chalk.cyan(`\n🚀 Initializing ${chalk.bold(projectName)} in ${chalk.yellow(effectiveLanguage)}...\n`));
 
     try {
       if (fs.existsSync(targetPath)) {
@@ -122,6 +140,22 @@ program
       console.error(chalk.red('❌ Error creating project:'), err);
     }
   });
+
+// Smart Resolution Helper for Web src directory
+function resolveWebPath() {
+  const cwd = process.cwd();
+
+  if (fs.existsSync(path.join(cwd, 'web', 'src', 'pages'))) {
+    return path.join(cwd, 'web', 'src', 'pages');
+  }
+  if (path.basename(cwd) === 'web' && fs.existsSync(path.join(cwd, 'src', 'pages'))) {
+    return path.join(cwd, 'src', 'pages');
+  }
+  if (path.basename(cwd) === 'src' && path.basename(path.dirname(cwd)) === 'web') {
+    return path.join(cwd, 'pages');
+  }
+  return path.join(cwd, 'src', 'pages');
+}
 
 // Smart Resolution Helper for API src directory and TS status
 function resolveProjectPath() {
@@ -430,6 +464,94 @@ export const ${camel}Middleware = (req: Request, res: Response, next: NextFuncti
   }
 }
 
+function generatePage(name, isTS) {
+  const cap = name.charAt(0).toUpperCase() + name.slice(1);
+  const camel = name.charAt(0).toLowerCase() + name.slice(1);
+  if (isTS) {
+    return `import { useState, useEffect } from 'react';
+import { ApexTable, ApexTableColumn } from 'react-apextable-pro';
+import { api } from '../api/client';
+
+interface ${cap}Item {
+  _id?: string;
+  name: string;
+  createdAt?: string;
+}
+
+export default function ${cap}Page() {
+  const [items, setItems] = useState<${cap}Item[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.resource('${camel}s').safe().get()
+      .then((res: any) => {
+        if (res.ok && Array.isArray(res.data)) {
+          setItems(res.data);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const columns: ApexTableColumn<${cap}Item>[] = [
+    { name: 'Name', selector: row => row.name, sortable: true },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
+        <h1 className="font-outfit font-extrabold text-2xl text-white mb-4">${cap} Management</h1>
+        {loading ? (
+          <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
+        ) : (
+          <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
+        )}
+      </div>
+    </div>
+  );
+}
+`;
+  } else {
+    return `import { useState, useEffect } from 'react';
+import { ApexTable } from 'react-apextable-pro';
+import { api } from '../api/client';
+
+export default function ${cap}Page() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.resource('${camel}s').safe().get()
+      .then((res) => {
+        if (res.ok && Array.isArray(res.data)) {
+          setItems(res.data);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const columns = [
+    { name: 'Name', selector: row => row.name, sortable: true },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
+        <h1 className="font-outfit font-extrabold text-2xl text-white mb-4">${cap} Management</h1>
+        {loading ? (
+          <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
+        ) : (
+          <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
+        )}
+      </div>
+    </div>
+  );
+}
+`;
+  }
+}
+
 // Generate Command
 program
   .command('generate')
@@ -475,9 +597,26 @@ program
       createFile('controllers', `${camelName}Controller.${ext}`, generateController(name, isTS));
       createFile('routes', `${camelName}Routes.${ext}`, generateRoute(name, isTS));
 
+      // Create frontend page
+      const webPagesDir = resolveWebPath();
+      const webExt = isTS ? 'tsx' : 'jsx';
+      const pagePath = path.join(webPagesDir, `${capitalizedName}Page.${webExt}`);
+
+      if (fs.existsSync(pagePath)) {
+        console.log(chalk.yellow(`⚠️ Warning: ${capitalizedName}Page.${webExt} already exists. Skipping.`));
+      } else {
+        fs.ensureDirSync(webPagesDir);
+        fs.writeFileSync(pagePath, generatePage(name, isTS));
+        const relativePagePath = path.relative(process.cwd(), pagePath);
+        console.log(chalk.green(`✅ Created page: ${chalk.bold(relativePagePath)}`));
+      }
+
       console.log(chalk.magenta(`\n💡 Don't forget to mount your new route in server.${ext}:`));
       console.log(chalk.gray(`   import ${camelName}Routes from './routes/${camelName}Routes.js';`));
-      console.log(chalk.gray(`   app.use('/api/${camelName}s', ${camelName}Routes);\n`));
+      console.log(chalk.gray(`   app.use('/api/${camelName}s', ${camelName}Routes);`));
+      console.log(chalk.magenta(`💡 Then add the page to your router in App.${webExt}:\n`));
+      console.log(chalk.gray(`   import ${capitalizedName}Page from './pages/${capitalizedName}Page';`));
+      console.log(chalk.gray(`   <Route path="/${camelName}s" element={<${capitalizedName}Page />} />\n`));
     } else {
       let content = '';
       let folder = '';

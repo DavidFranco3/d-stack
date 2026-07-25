@@ -1,29 +1,22 @@
 export function softDeletePlugin(schema) {
-  schema.add({
-    deletedAt: { type: Date, default: null },
-    isDeleted: { type: Boolean, default: false }
-  });
-
-  const filterNonDeleted = function() {
-    if (this.getFilter().isDeleted === undefined) {
-      this.where({ isDeleted: false });
+  const filterActive = function () {
+    if (this.getFilter().status === undefined) {
+      this.where({ status: 1 });
     }
   };
 
-  schema.pre('find', filterNonDeleted);
-  schema.pre('findOne', filterNonDeleted);
-  schema.pre('findOneAndUpdate', filterNonDeleted);
-  schema.pre('countDocuments', filterNonDeleted);
+  schema.pre('find', filterActive);
+  schema.pre('findOne', filterActive);
+  schema.pre('findOneAndUpdate', filterActive);
+  schema.pre('countDocuments', filterActive);
 
-  schema.methods.softDelete = async function() {
-    this.isDeleted = true;
-    this.deletedAt = new Date();
+  schema.methods.softDelete = async function () {
+    this.status = 0;
     return this.save();
   };
 
-  schema.methods.restore = async function() {
-    this.isDeleted = false;
-    this.deletedAt = null;
+  schema.methods.restore = async function () {
+    this.status = 1;
     return this.save();
   };
 }

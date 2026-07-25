@@ -1,31 +1,24 @@
-import { Schema, Query, Document } from 'mongoose';
+import { Schema } from 'mongoose';
 
 export function softDeletePlugin(schema: Schema) {
-  schema.add({
-    deletedAt: { type: Date, default: null },
-    isDeleted: { type: Boolean, default: false }
-  });
-
-  const filterNonDeleted = function(this: any) {
-    if (this.getFilter().isDeleted === undefined) {
-      this.where({ isDeleted: false });
+  const filterActive = function (this: any) {
+    if (this.getFilter().status === undefined) {
+      this.where({ status: 1 });
     }
   };
 
-  schema.pre('find', filterNonDeleted);
-  schema.pre('findOne', filterNonDeleted);
-  schema.pre('findOneAndUpdate', filterNonDeleted);
-  schema.pre('countDocuments', filterNonDeleted);
+  schema.pre('find', filterActive);
+  schema.pre('findOne', filterActive);
+  schema.pre('findOneAndUpdate', filterActive);
+  schema.pre('countDocuments', filterActive);
 
-  schema.methods.softDelete = async function() {
-    this.isDeleted = true;
-    this.deletedAt = new Date();
+  schema.methods.softDelete = async function () {
+    this.status = 0;
     return this.save();
   };
 
-  schema.methods.restore = async function() {
-    this.isDeleted = false;
-    this.deletedAt = null;
+  schema.methods.restore = async function () {
+    this.status = 1;
     return this.save();
   };
 }
