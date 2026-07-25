@@ -131,7 +131,7 @@ my-app/
 
 ## Included Libraries
 
-The project bundles three packages published on npm:
+The project bundles three npm packages by the same author:
 
 | Package | Purpose |
 |---------|---------|
@@ -149,6 +149,20 @@ The project bundles three packages published on npm:
 | `npm run build` | Build Web (Vite) + API (tsc) |
 | `npm run start` | Start production API server |
 | `npm test` | Run API tests (vitest) |
+
+---
+
+## Deploy Documentation Site to GitHub Pages
+
+The `site/` directory contains the documentation landing page. To publish it:
+
+```bash
+git add site/
+git commit -m "docs: update documentation site"
+git subtree push --prefix site origin gh-pages
+```
+
+Your site will be at `https://DavidFranco3.github.io/d-stack/`.
 
 ---
 
