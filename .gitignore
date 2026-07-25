@@ -19,6 +19,8 @@ Thumbs.db
 *.swo
 
 # Project specific
+mi-dstack-demo/
+test-*/
 test-gravity-app-final/
 tsc_output.txt
 tsc_output_2.txt

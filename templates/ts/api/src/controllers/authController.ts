@@ -11,7 +11,7 @@ export class AuthController {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      const token = await AuthService.genterateToken(user);
+      const token = await AuthService.generateToken(user);
       
       res.json({
         token,

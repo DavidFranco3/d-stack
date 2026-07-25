@@ -8,12 +8,13 @@ import { rateLimit } from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import { ApiResponse } from '../../shared/types.js';
 import { connectDB } from './config/db.js';
+import { seedDatabase } from './config/seed.js';
 import { logger, loggerMiddleware } from './middleware/logger.js';
-import { User } from './models/User.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 // Routes
 import authRoutes from './routes/authRoutes.js';
+import resourceRoutes from './routes/resourceRoutes.js';
 
 dotenv.config();
 
@@ -23,14 +24,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Connect to Database
-connectDB();
+// Connect to Database & Seed 4 Initial Collections
+connectDB().then(() => {
+  seedDatabase();
+});
 
 // Security Middleware
 app.use(helmet());
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 app.use('/api/', limiter);
@@ -41,29 +44,12 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(loggerMiddleware);
 
-// Default User Seeder
-async function seedAdmin() {
-  try {
-    const adminExists = await User.findOne({ email: 'admin@dstack.com' });
-    if (!adminExists) {
-      const admin = new User({
-        name: 'David Admin',
-        email: 'admin@dstack.com',
-        password: '12345678',
-      });
-      await admin.save();
-      logger.info('👤 Default admin user created (admin@dstack.com / 12345678)');
-    }
-  } catch (err) {
-    logger.error('Error seeding admin user: ' + err);
-  }
-}
-seedAdmin();
-
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/resources', resourceRoutes);
 
-app.get('/api/health', (req: Request, res: Response) => {
+// Health Check & Root API Endpoints
+app.get(['/api', '/api/health'], (req: Request, res: Response) => {
   const response: ApiResponse = { status: 'ok', message: 'D-Stack API is running' };
   res.json(response);
 });

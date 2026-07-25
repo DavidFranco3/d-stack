@@ -6,6 +6,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
+  role: string;
+  status: number; // 1 = Active, 0 = Soft Deleted
   isDeleted: boolean;
   deletedAt?: Date;
   comparePassword(password: string): Promise<boolean>;
@@ -15,6 +17,8 @@ const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name: { type: String, required: true },
+  role: { type: String, default: 'User' },
+  status: { type: Number, default: 1 },
 }, { timestamps: true });
 
 UserSchema.plugin(softDeletePlugin);

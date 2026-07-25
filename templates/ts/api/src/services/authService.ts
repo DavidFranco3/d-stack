@@ -4,7 +4,7 @@ import { User, IUser } from '../models/User.js';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export class AuthService {
-  static async genterateToken(user: IUser): Promise<string> {
+  static async generateToken(user: IUser): Promise<string> {
     return jwt.sign(
       { id: user._id, email: user.email },
       JWT_SECRET,

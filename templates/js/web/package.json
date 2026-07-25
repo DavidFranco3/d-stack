@@ -1,5 +1,5 @@
 {
-  "name": "gravity-web",
+  "name": "dstack-web",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,13 +9,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "framer-motion": "^11.5.0",
-    "lucide-react": "^0.439.0"
+    "fluent-rest-client": "^1.0.0",
+    "framer-motion": "^12.42.2",
+    "intl-currency-helper": "^2.0.0",
+    "lucide-react": "^1.26.0",
+    "prop-types": "^15.8.1",
+    "react": "^19.2.8",
+    "react-apextable-pro": "^1.0.3",
+    "react-csv": "^2.2.2",
+    "react-data-table-component": "^7.6.2",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.1",
+    "styled-components": "^6.4.4",
+    "sweetalert2": "^11.26.25"
   },
   "devDependencies": {
-    "vite": "^5.4.1",
-    "@vitejs/plugin-react": "^4.3.1"
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.14"
   }
 }

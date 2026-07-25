@@ -1,10 +1,10 @@
 {
-  "name": "gravity-app-ts",
+  "name": "dstack-app-ts",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "install-all": "npm install && cd api && npm install && cd ../web && npm install",
+    "install-all": "npm install && npm --prefix api install && npm --prefix web install",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "cd api && npm run dev",
     "dev:web": "cd web && npm run dev",
