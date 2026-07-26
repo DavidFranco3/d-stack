@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "fluent-rest-client": "^1.0.0",
+    "fluent-rest-client": "^1.1.0",
     "framer-motion": "^12.42.2",
     "intl-currency-helper": "^2.0.0",
     "lucide-react": "^1.26.0",
