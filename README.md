@@ -3,8 +3,8 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18.0.0-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js Version" />
   <img src="https://img.shields.io/badge/React-v19.2.8-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React Version" />
-  <img src="https://img.shields.io/badge/Vite-v5.4.14-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite Version" />
-  <img src="https://img.shields.io/badge/Express-v4.21.2-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express Version" />
+  <img src="https://img.shields.io/badge/Vite-v8.1.5-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite Version" />
+  <img src="https://img.shields.io/badge/Express-v4.22.1-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express Version" />
   <img src="https://img.shields.io/badge/MongoDB-v6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Version" />
   <img src="https://img.shields.io/badge/License-ISC-ff69b4?style=for-the-badge" alt="License" />
 </p>
