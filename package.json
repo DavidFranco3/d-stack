@@ -1,5 +1,5 @@
 {
-  "name": "dstack",
+  "name": "@davidfranco3/dstack",
   "version": "1.0.0",
   "description": "A fullstack monolith framework for Express and React by David Franco",
   "main": "cli/index.js",

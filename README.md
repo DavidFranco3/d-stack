@@ -23,10 +23,8 @@ Full-stack monolith framework — Express API + React 19 SPA + MongoDB. CLI-driv
 ## Quick Start
 
 ```bash
-# 1. Install CLI (from cloned repo — not published on npm)
-git clone <repo-url>
-cd d-stack
-npm link
+# 1. Install CLI
+npm install -g @davidfranco3/dstack
 
 # 2. Scaffold a project
 dstack init my-app -t ts
