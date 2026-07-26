@@ -117,7 +117,7 @@ Commands:
   const copyInstallBtn = document.getElementById('copyInstallBtn');
   if (copyInstallBtn) {
     copyInstallBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText('npm link dstack');
+      navigator.clipboard.writeText('npm install -g @davidfranco3/dstack');
       const originalHTML = copyInstallBtn.innerHTML;
       copyInstallBtn.innerHTML = '<i data-lucide="check" style="color:#10b981;"></i>';
       if (window.lucide) lucide.createIcons();
