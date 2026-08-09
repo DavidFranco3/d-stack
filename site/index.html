@@ -25,7 +25,7 @@
         <div class="brand-icon">
           <i data-lucide="rocket"></i>
         </div>
-        <span class="brand-name">D-Stack <span class="brand-badge">v1.0</span></span>
+        <span class="brand-name">D-Stack <span class="brand-badge">v1.1</span></span>
       </div>
 
       <ul class="nav-links">
@@ -218,8 +218,9 @@
           <div class="terminal-actions">
             <button class="term-btn active" onclick="runSimulatedCommand('init')">dstack init</button>
             <button class="term-btn" onclick="runSimulatedCommand('resource')">dstack g resource Product</button>
+            <button class="term-btn" onclick="runSimulatedCommand('auth')">dstack g auth</button>
+            <button class="term-btn" onclick="runSimulatedCommand('remove')">dstack remove resource</button>
             <button class="term-btn" onclick="runSimulatedCommand('doctor')">dstack doctor</button>
-            <button class="term-btn" onclick="runSimulatedCommand('help')">dstack --help</button>
           </div>
         </div>
 
@@ -254,19 +255,27 @@
             </div>
           </button>
 
+          <button class="cli-hub-tab" data-cmd="auth">
+            <div class="tab-icon icon-pink"><i data-lucide="key-round"></i></div>
+            <div class="tab-info">
+              <span class="tab-cmd">dstack g auth</span>
+              <span class="tab-desc">Auth & Registration UI</span>
+            </div>
+          </button>
+
+          <button class="cli-hub-tab" data-cmd="remove">
+            <div class="tab-icon icon-amber"><i data-lucide="trash-2"></i></div>
+            <div class="tab-info">
+              <span class="tab-cmd">dstack remove</span>
+              <span class="tab-desc">Remove resource & routes</span>
+            </div>
+          </button>
+
           <button class="cli-hub-tab" data-cmd="doctor">
             <div class="tab-icon icon-purple"><i data-lucide="activity"></i></div>
             <div class="tab-info">
               <span class="tab-cmd">dstack doctor</span>
               <span class="tab-desc">System diagnostics</span>
-            </div>
-          </button>
-
-          <button class="cli-hub-tab" data-cmd="help">
-            <div class="tab-icon icon-amber"><i data-lucide="help-circle"></i></div>
-            <div class="tab-info">
-              <span class="tab-cmd">dstack --help</span>
-              <span class="tab-desc">Usage & options</span>
             </div>
           </button>
         </div>
@@ -321,16 +330,16 @@
           <div class="feature-icon icon-pink">
             <i data-lucide="zap"></i>
           </div>
-          <h3 class="feature-title">CRUD Generator</h3>
-          <p class="feature-desc"><code>dstack g resource &lt;Name&gt;</code> generates model, service, controller, routes, and a React page with data table.</p>
+          <h3 class="feature-title">CRUD & Auth Generator</h3>
+          <p class="feature-desc"><code>dstack g resource &lt;Name&gt;</code> auto-injects routes & React pages with Modals & Toasts. <code>dstack g auth</code> scaffolds full Auth & Registration UI.</p>
         </div>
 
         <div class="feature-card">
           <div class="feature-icon icon-cyan">
-            <i data-lucide="globe"></i>
+            <i data-lucide="file-text"></i>
           </div>
-          <h3 class="feature-title">fluent-rest-client</h3>
-          <p class="feature-desc">Pre-configured HTTP client in the frontend with JWT token handling.</p>
+          <h3 class="feature-title">OpenAPI / Swagger UI</h3>
+          <p class="feature-desc">Built-in interactive Swagger UI documentation endpoint at <code>/api/docs</code> out-of-the-box.</p>
         </div>
       </div>
     </div>
