@@ -1,20 +1,21 @@
 {
   "name": "@davidfranco3/dstack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A fullstack monolith framework for Express and React by David Franco",
   "main": "cli/index.js",
   "bin": {
     "dstack": "./cli/index.js"
   },
   "scripts": {
-    "site": "npx serve site"
+    "site": "npx serve site",
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
-    "commander": "^12.0.0",
-    "fs-extra": "^11.2.0",
-    "inquirer": "^9.2.14",
-    "shelljs": "^0.8.5"
+    "chalk": "^6.0.0",
+    "commander": "^15.0.0",
+    "fs-extra": "^11.4.0",
+    "inquirer": "^14.0.2",
+    "shelljs": "^0.10.0"
   },
   "keywords": [
     "dstack",

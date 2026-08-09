@@ -7,11 +7,26 @@ export interface AppError extends Error {
 }
 
 export const errorHandler = (
-  err: AppError,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  if (err?.name === 'ZodError' || Array.isArray(err?.issues)) {
+    const formattedErrors: Record<string, string> = {};
+    (err.issues || []).forEach((issue: any) => {
+      const field = issue.path?.join('.') || 'general';
+      formattedErrors[field] = issue.message;
+    });
+
+    return res.status(400).json({
+      error: true,
+      code: 'VALIDATION_ERROR',
+      message: 'Validation failed',
+      errors: formattedErrors,
+    });
+  }
+
   const statusCode = err.statusCode || 500;
   const errorCode = err.code || 'INTERNAL_SERVER_ERROR';
 

@@ -29,7 +29,7 @@ const showBanner = () => {
 program
   .name('dstack')
   .description('D-Stack CLI: Generate full-stack monolith applications and components')
-  .version('1.0.0');
+  .version('1.1.0');
 
 // Initialize Command
 program
@@ -221,9 +221,32 @@ function generateService(name, isTS) {
   if (isTS) {
     return `import { ${cap} } from '../models/${cap}.js';
 
+export interface PaginationOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
 export class ${cap}Service {
-  static async getAll() {
-    return await ${cap}.find();
+  static async getAll(options: PaginationOptions = {}) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.max(1, Number(options.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const filter = options.search ? { name: { $regex: options.search, $options: 'i' } } : {};
+
+    const [data, total] = await Promise.all([
+      ${cap}.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      ${cap}.countDocuments(filter)
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
   static async getById(id: string) {
@@ -248,8 +271,25 @@ export class ${cap}Service {
     return `import { ${cap} } from '../models/${cap}.js';
 
 export class ${cap}Service {
-  static async getAll() {
-    return await ${cap}.find();
+  static async getAll(options = {}) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.max(1, Number(options.limit) || 10);
+    const skip = (page - 1) * limit;
+
+    const filter = options.search ? { name: { $regex: options.search, $options: 'i' } } : {};
+
+    const [data, total] = await Promise.all([
+      ${cap}.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 }),
+      ${cap}.countDocuments(filter)
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
   static async getById(id) {
@@ -283,8 +323,12 @@ import { ${cap}Service } from '../services/${camel}Service.js';
 export class ${cap}Controller {
   static async getAll(req: Request, res: Response, next: NextFunction) {
     try {
-      const items = await ${cap}Service.getAll();
-      res.json(items);
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const search = req.query.search ? String(req.query.search) : '';
+
+      const result = await ${cap}Service.getAll({ page, limit, search });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -336,8 +380,12 @@ export class ${cap}Controller {
 export class ${cap}Controller {
   static async getAll(req, res, next) {
     try {
-      const items = await ${cap}Service.getAll();
-      res.json(items);
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 10;
+      const search = req.query.search ? String(req.query.search) : '';
+
+      const result = await ${cap}Service.getAll({ page, limit, search });
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -470,6 +518,7 @@ function generatePage(name, isTS) {
   if (isTS) {
     return `import { useState, useEffect } from 'react';
 import { ApexTable, ApexTableColumn } from 'react-apextable-pro';
+import Swal from 'sweetalert2';
 import { api } from '../api/client';
 
 interface ${cap}Item {
@@ -478,35 +527,158 @@ interface ${cap}Item {
   createdAt?: string;
 }
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  background: '#12161f',
+  color: '#ffffff',
+});
+
 export default function ${cap}Page() {
   const [items, setItems] = useState<${cap}Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<${cap}Item | null>(null);
+  const [nameInput, setNameInput] = useState('');
 
-  useEffect(() => {
+  const fetchItems = () => {
+    setLoading(true);
     api.resource('${camel}s').safe().get()
       .then((res: any) => {
-        if (res.ok && Array.isArray(res.data)) {
-          setItems(res.data);
+        if (res.ok && res.data) {
+          const list = Array.isArray(res.data) ? res.data : (res.data.data || []);
+          setItems(list);
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchItems();
   }, []);
+
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setNameInput('');
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item: ${cap}Item) => {
+    setEditingItem(item);
+    setNameInput(item.name);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nameInput.trim()) return;
+
+    if (editingItem && editingItem._id) {
+      const res: any = await api.resource('${camel}s').safe().put(editingItem._id, { name: nameInput });
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} updated successfully!' });
+        setIsModalOpen(false);
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#12161f', color: '#fff' });
+      }
+    } else {
+      const res: any = await api.resource('${camel}s').safe().post({ name: nameInput });
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} created successfully!' });
+        setIsModalOpen(false);
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#12161f', color: '#fff' });
+      }
+    }
+  };
+
+  const handleDelete = async (id?: string) => {
+    if (!id) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this ${camel}?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e11d48',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#12161f',
+      color: '#ffffff',
+    });
+
+    if (result.isConfirmed) {
+      const res: any = await api.resource('${camel}s').safe().delete(id);
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#12161f', color: '#fff' });
+      }
+    }
+  };
 
   const columns: ApexTableColumn<${cap}Item>[] = [
     { name: 'Name', selector: row => row.name, sortable: true },
+    {
+      name: 'Actions',
+      cell: (row: ${cap}Item) => (
+        <Dropdown>
+          <Dropdown.Trigger />
+          <Dropdown.Content>
+            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-cyan-300">
+              <Edit2 size={15} /> Edit
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-rose-400">
+              <Trash2 size={15} /> Delete
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
       <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
-        <h1 className="font-outfit font-extrabold text-2xl text-white mb-4">${cap} Management</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="font-outfit font-extrabold text-2xl text-white">${cap} Management</h1>
+          <button onClick={handleOpenCreate} className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition">
+            + New ${cap}
+          </button>
+        </div>
+
         {loading ? (
           <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
         ) : (
           <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
         )}
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#12161f] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-slate-400 text-sm mb-1">Name</label>
+                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="Enter name..." />
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition">
+                  {editingItem ? 'Save Changes' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -514,36 +686,416 @@ export default function ${cap}Page() {
   } else {
     return `import { useState, useEffect } from 'react';
 import { ApexTable } from 'react-apextable-pro';
+import Swal from 'sweetalert2';
 import { api } from '../api/client';
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  background: '#12161f',
+  color: '#ffffff',
+});
 
 export default function ${cap}Page() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [nameInput, setNameInput] = useState('');
 
-  useEffect(() => {
+  const fetchItems = () => {
+    setLoading(true);
     api.resource('${camel}s').safe().get()
       .then((res) => {
-        if (res.ok && Array.isArray(res.data)) {
-          setItems(res.data);
+        if (res.ok && res.data) {
+          const list = Array.isArray(res.data) ? res.data : (res.data.data || []);
+          setItems(list);
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchItems();
   }, []);
+
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setNameInput('');
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditingItem(item);
+    setNameInput(item.name);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!nameInput.trim()) return;
+
+    if (editingItem && editingItem._id) {
+      const res = await api.resource('${camel}s').safe().put(editingItem._id, { name: nameInput });
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} updated successfully!' });
+        setIsModalOpen(false);
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#12161f', color: '#fff' });
+      }
+    } else {
+      const res = await api.resource('${camel}s').safe().post({ name: nameInput });
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} created successfully!' });
+        setIsModalOpen(false);
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#12161f', color: '#fff' });
+      }
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!id) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this ${camel}?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e11d48',
+      cancelButtonColor: '#334155',
+      confirmButtonText: 'Yes, delete it!',
+      background: '#12161f',
+      color: '#ffffff',
+    });
+
+    if (result.isConfirmed) {
+      const res = await api.resource('${camel}s').safe().delete(id);
+      if (res.ok) {
+        Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
+        fetchItems();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#12161f', color: '#fff' });
+      }
+    }
+  };
 
   const columns = [
     { name: 'Name', selector: row => row.name, sortable: true },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <Dropdown>
+          <Dropdown.Trigger />
+          <Dropdown.Content>
+            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-cyan-300">
+              <Edit2 size={15} /> Edit
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-rose-400">
+              <Trash2 size={15} /> Delete
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown>
+      ),
+    },
   ];
 
   return (
     <div className="space-y-6">
       <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
-        <h1 className="font-outfit font-extrabold text-2xl text-white mb-4">${cap} Management</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="font-outfit font-extrabold text-2xl text-white">${cap} Management</h1>
+          <button onClick={handleOpenCreate} className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition">
+            + New ${cap}
+          </button>
+        </div>
+
         {loading ? (
           <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
         ) : (
           <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
         )}
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#12161f] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-slate-400 text-sm mb-1">Name</label>
+                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="Enter name..." />
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition">
+                  {editingItem ? 'Save Changes' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+`;
+  }
+}
+
+// Auto-injection Helpers
+function injectServerRoute(apiSrcDir, camelName, isTS) {
+  const ext = isTS ? 'ts' : 'js';
+  const serverPath = path.join(apiSrcDir, `server.${ext}`);
+  if (!fs.existsSync(serverPath)) return false;
+
+  let content = fs.readFileSync(serverPath, 'utf-8');
+  const routeImport = `import ${camelName}Routes from './routes/${camelName}Routes.js';`;
+  const routeMount = `app.use('/api/${camelName}s', ${camelName}Routes);`;
+
+  if (content.includes(routeImport) || content.includes(routeMount)) {
+    return false;
+  }
+
+  if (content.includes("import resourceRoutes from './routes/resourceRoutes.js';")) {
+    content = content.replace(
+      "import resourceRoutes from './routes/resourceRoutes.js';",
+      `import resourceRoutes from './routes/resourceRoutes.js';\n${routeImport}`
+    );
+  } else if (content.includes('// Routes')) {
+    content = content.replace(
+      '// Routes',
+      `// Routes\n${routeImport}`
+    );
+  } else {
+    content = `${routeImport}\n${content}`;
+  }
+
+  if (content.includes("app.use('/api/resources', resourceRoutes);")) {
+    content = content.replace(
+      "app.use('/api/resources', resourceRoutes);",
+      `app.use('/api/resources', resourceRoutes);\napp.use('/api/${camelName}s', ${camelName}Routes);`
+    );
+  } else if (content.includes('// API Routes')) {
+    content = content.replace(
+      '// API Routes',
+      `// API Routes\napp.use('/api/${camelName}s', ${camelName}Routes);`
+    );
+  } else {
+    content = content.replace(
+      'app.listen',
+      `app.use('/api/${camelName}s', ${camelName}Routes);\n\napp.listen`
+    );
+  }
+
+  fs.writeFileSync(serverPath, content);
+  return true;
+}
+
+function injectWebAppRoute(webPagesDir, capitalizedName, camelName, isTS) {
+  const webSrcDir = path.dirname(webPagesDir);
+  const appPathTS = path.join(webSrcDir, 'App.tsx');
+  const appPathJS = path.join(webSrcDir, 'App.jsx');
+  const appPath = fs.existsSync(appPathTS) ? appPathTS : (fs.existsSync(appPathJS) ? appPathJS : null);
+  if (!appPath) return false;
+
+  let content = fs.readFileSync(appPath, 'utf-8');
+  const pageImport = `import ${capitalizedName}Page from './pages/${capitalizedName}Page';`;
+  const routeElement = `<Route path="/${camelName}s" element={<${capitalizedName}Page />} />`;
+
+  if (content.includes(pageImport) || content.includes(routeElement)) {
+    return false;
+  }
+
+  if (content.includes("import SettingsPage from './pages/SettingsPage';")) {
+    content = content.replace(
+      "import SettingsPage from './pages/SettingsPage';",
+      `import SettingsPage from './pages/SettingsPage';\n${pageImport}`
+    );
+  } else {
+    const lines = content.split('\n');
+    const lastImportIdx = lines.findLastIndex(l => l.startsWith('import '));
+    if (lastImportIdx !== -1) {
+      lines.splice(lastImportIdx + 1, 0, pageImport);
+      content = lines.join('\n');
+    } else {
+      content = `${pageImport}\n${content}`;
+    }
+  }
+
+  if (content.includes('<Route path="/settings" element={<SettingsPage />} />')) {
+    content = content.replace(
+      '<Route path="/settings" element={<SettingsPage />} />',
+      `<Route path="/settings" element={<SettingsPage />} />\n          ${routeElement}`
+    );
+  } else if (content.includes('</Route>')) {
+    content = content.replace(
+      '</Route>',
+      `  ${routeElement}\n        </Route>`
+    );
+  }
+
+  fs.writeFileSync(appPath, content);
+  return true;
+}
+
+function ejectServerRoute(apiSrcDir, camelName, isTS) {
+  const ext = isTS ? 'ts' : 'js';
+  const serverPath = path.join(apiSrcDir, `server.${ext}`);
+  if (!fs.existsSync(serverPath)) return false;
+
+  let content = fs.readFileSync(serverPath, 'utf-8');
+  const routeImportPattern = new RegExp(`import\\s+${camelName}Routes\\s+from\\s+['"]\\./routes/${camelName}Routes\\.js['"];?\\r?\\n?`, 'g');
+  const routeMountPattern = new RegExp(`app\\.use\\(['"]\\/api\\/${camelName}s['"],\\s*${camelName}Routes\\);?\\r?\\n?`, 'g');
+
+  content = content.replace(routeImportPattern, '').replace(routeMountPattern, '');
+  fs.writeFileSync(serverPath, content);
+  return true;
+}
+
+function ejectWebAppRoute(webPagesDir, capitalizedName, camelName, isTS) {
+  const webSrcDir = path.dirname(webPagesDir);
+  const appPathTS = path.join(webSrcDir, 'App.tsx');
+  const appPathJS = path.join(webSrcDir, 'App.jsx');
+  const appPath = fs.existsSync(appPathTS) ? appPathTS : (fs.existsSync(appPathJS) ? appPathJS : null);
+  if (!appPath) return false;
+
+  let content = fs.readFileSync(appPath, 'utf-8');
+  const pageImportPattern = new RegExp(`import\\s+${capitalizedName}Page\\s+from\\s+['"]\\./pages/${capitalizedName}Page['"];?\\r?\\n?`, 'g');
+  const routeElementPattern = new RegExp(`<Route\\s+path=["']\\/${camelName}s["']\\s+element={<${capitalizedName}Page\\s*\\/>}\\s*\\/>?\\r?\\n?`, 'g');
+
+  content = content.replace(pageImportPattern, '').replace(routeElementPattern, '');
+  fs.writeFileSync(appPath, content);
+  return true;
+}
+
+function generateRegisterPage(isTS) {
+  if (isTS) {
+    return `import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { api } from '../api/client';
+
+export default function RegisterPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res: any = await api.post('/api/auth/register', { name, email, password });
+      if (res.ok && res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        window.location.href = '/dashboard';
+      } else {
+        setError(res.data?.message || 'Registration failed');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during registration');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#12161f]/90 border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <h2 className="font-outfit text-3xl font-extrabold text-white text-center mb-6">Create Account</h2>
+        {error && <div className="p-3 mb-4 rounded-xl bg-red-500/20 text-red-300 text-sm border border-red-500/30">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Full Name</label>
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Email</label>
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Password</label>
+            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition">
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        <p className="text-center text-slate-400 text-sm mt-6">
+          Already have an account? <Link to="/login" className="text-cyan-400 font-semibold hover:underline">Log in</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+`;
+  } else {
+    return `import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { api } from '../api/client';
+
+export default function RegisterPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await api.post('/api/auth/register', { name, email, password });
+      if (res.ok && res.data?.token) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        window.location.href = '/dashboard';
+      } else {
+        setError(res.data?.message || 'Registration failed');
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred during registration');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#12161f]/90 border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <h2 className="font-outfit text-3xl font-extrabold text-white text-center mb-6">Create Account</h2>
+        {error && <div className="p-3 mb-4 rounded-xl bg-red-500/20 text-red-300 text-sm border border-red-500/30">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Full Name</label>
+            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Email</label>
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1">Password</label>
+            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          </div>
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition">
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
+        <p className="text-center text-slate-400 text-sm mt-6">
+          Already have an account? <Link to="/login" className="text-cyan-400 font-semibold hover:underline">Log in</Link>
+        </p>
       </div>
     </div>
   );
@@ -556,11 +1108,11 @@ export default function ${cap}Page() {
 program
   .command('generate')
   .alias('g')
-  .description('Generate a new component (model, controller, service, route, middleware, resource)')
-  .argument('<type>', 'Component type: model, controller, service, route, middleware, resource')
-  .argument('<name>', 'Name of the component')
+  .description('Generate a new component (model, controller, service, route, middleware, resource, auth)')
+  .argument('<type>', 'Component type: model, controller, service, route, middleware, resource, auth')
+  .argument('[name]', 'Name of the component')
   .action(async (type, name) => {
-    const validTypes = ['model', 'controller', 'service', 'route', 'middleware', 'resource', 'res'];
+    const validTypes = ['model', 'controller', 'service', 'route', 'middleware', 'resource', 'res', 'auth'];
     const normalizedType = type.toLowerCase();
 
     if (!validTypes.includes(normalizedType)) {
@@ -568,11 +1120,19 @@ program
       process.exit(1);
     }
 
+    if (normalizedType !== 'auth' && !name) {
+      console.error(chalk.red(`❌ Component name is required for type "${type}".`));
+      process.exit(1);
+    }
+
     const { apiSrcDir, isTS } = resolveProjectPath();
     const ext = isTS ? 'ts' : 'js';
+    const webPagesDir = resolveWebPath();
+    const webExt = isTS ? 'tsx' : 'jsx';
 
-    const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
-    const camelName = name.charAt(0).toLowerCase() + name.slice(1);
+    const targetName = name || 'Auth';
+    const capitalizedName = targetName.charAt(0).toUpperCase() + targetName.slice(1);
+    const camelName = targetName.charAt(0).toLowerCase() + targetName.slice(1);
 
     const createFile = (subfolder, filename, content) => {
       const folderPath = path.join(apiSrcDir, subfolder);
@@ -590,6 +1150,40 @@ program
       return true;
     };
 
+    if (normalizedType === 'auth') {
+      console.log(chalk.cyan(`\n⚡ Scaffolding Auth Module...\n`));
+      const regPagePath = path.join(webPagesDir, `RegisterPage.${webExt}`);
+      if (!fs.existsSync(regPagePath)) {
+        fs.ensureDirSync(webPagesDir);
+        fs.writeFileSync(regPagePath, generateRegisterPage(isTS));
+        console.log(chalk.green(`✅ Created page: ${chalk.bold(path.relative(process.cwd(), regPagePath))}`));
+      }
+
+      const webSrcDir = path.dirname(webPagesDir);
+      const appPathTS = path.join(webSrcDir, 'App.tsx');
+      const appPathJS = path.join(webSrcDir, 'App.jsx');
+      const appPath = fs.existsSync(appPathTS) ? appPathTS : (fs.existsSync(appPathJS) ? appPathJS : null);
+
+      if (appPath) {
+        let appContent = fs.readFileSync(appPath, 'utf-8');
+        if (!appContent.includes("import RegisterPage from './pages/RegisterPage';")) {
+          appContent = appContent.replace(
+            "import Login from './pages/Login';",
+            "import Login from './pages/Login';\nimport RegisterPage from './pages/RegisterPage';"
+          );
+          appContent = appContent.replace(
+            '<Route \n          path="/login"',
+            '<Route path="/register" element={<RegisterPage />} />\n        <Route \n          path="/login"'
+          );
+          fs.writeFileSync(appPath, appContent);
+          console.log(chalk.green(`✅ Auto-registered /register route in App.${webExt}`));
+        }
+      }
+
+      console.log(chalk.green(`\n🎉 Auth Module successfully scaffolded!\n`));
+      return;
+    }
+
     if (normalizedType === 'resource' || normalizedType === 'res') {
       console.log(chalk.cyan(`\n⚡ Scaffolding resource "${capitalizedName}"...\n`));
       createFile('models', `${capitalizedName}.${ext}`, generateModel(name, isTS));
@@ -598,8 +1192,6 @@ program
       createFile('routes', `${camelName}Routes.${ext}`, generateRoute(name, isTS));
 
       // Create frontend page
-      const webPagesDir = resolveWebPath();
-      const webExt = isTS ? 'tsx' : 'jsx';
       const pagePath = path.join(webPagesDir, `${capitalizedName}Page.${webExt}`);
 
       if (fs.existsSync(pagePath)) {
@@ -611,12 +1203,25 @@ program
         console.log(chalk.green(`✅ Created page: ${chalk.bold(relativePagePath)}`));
       }
 
-      console.log(chalk.magenta(`\n💡 Don't forget to mount your new route in server.${ext}:`));
-      console.log(chalk.gray(`   import ${camelName}Routes from './routes/${camelName}Routes.js';`));
-      console.log(chalk.gray(`   app.use('/api/${camelName}s', ${camelName}Routes);`));
-      console.log(chalk.magenta(`💡 Then add the page to your router in App.${webExt}:\n`));
-      console.log(chalk.gray(`   import ${capitalizedName}Page from './pages/${capitalizedName}Page';`));
-      console.log(chalk.gray(`   <Route path="/${camelName}s" element={<${capitalizedName}Page />} />\n`));
+      // Auto-inject routes
+      const serverInjected = injectServerRoute(apiSrcDir, camelName, isTS);
+      const appInjected = injectWebAppRoute(webPagesDir, capitalizedName, camelName, isTS);
+
+      if (serverInjected) {
+        console.log(chalk.green(`✅ Auto-registered route in server.${ext}: ${chalk.bold(`app.use('/api/${camelName}s', ${camelName}Routes)`)}`));
+      } else {
+        console.log(chalk.magenta(`\n💡 Mount route in server.${ext}:`));
+        console.log(chalk.gray(`   import ${camelName}Routes from './routes/${camelName}Routes.js';`));
+        console.log(chalk.gray(`   app.use('/api/${camelName}s', ${camelName}Routes);`));
+      }
+
+      if (appInjected) {
+        console.log(chalk.green(`✅ Auto-registered page in App.${webExt}: ${chalk.bold(`<Route path="/${camelName}s" element={<${capitalizedName}Page />} />\n`)}`));
+      } else {
+        console.log(chalk.magenta(`💡 Page route in App.${webExt}:`));
+        console.log(chalk.gray(`   import ${capitalizedName}Page from './pages/${capitalizedName}Page';`));
+        console.log(chalk.gray(`   <Route path="/${camelName}s" element={<${capitalizedName}Page />} />\n`));
+      }
     } else {
       let content = '';
       let folder = '';
@@ -651,6 +1256,50 @@ program
       }
 
       createFile(folder, filename, content);
+    }
+  });
+
+// Remove Command
+program
+  .command('remove')
+  .alias('rm')
+  .description('Remove a scaffolded component or resource')
+  .argument('<type>', 'Component type: resource, auth')
+  .argument('[name]', 'Name of the component to remove')
+  .action(async (type, name) => {
+    const { apiSrcDir, isTS } = resolveProjectPath();
+    const ext = isTS ? 'ts' : 'js';
+    const webPagesDir = resolveWebPath();
+    const webExt = isTS ? 'tsx' : 'jsx';
+
+    const normalizedType = type.toLowerCase();
+    if (normalizedType === 'resource' || normalizedType === 'res') {
+      if (!name) {
+        console.error(chalk.red('❌ Resource name is required to remove.'));
+        process.exit(1);
+      }
+      const cap = name.charAt(0).toUpperCase() + name.slice(1);
+      const camel = name.charAt(0).toLowerCase() + name.slice(1);
+
+      const filesToRemove = [
+        path.join(apiSrcDir, 'models', `${cap}.${ext}`),
+        path.join(apiSrcDir, 'services', `${camel}Service.${ext}`),
+        path.join(apiSrcDir, 'controllers', `${camel}Controller.${ext}`),
+        path.join(apiSrcDir, 'routes', `${camel}Routes.${ext}`),
+        path.join(webPagesDir, `${cap}Page.${webExt}`),
+      ];
+
+      filesToRemove.forEach(filePath => {
+        if (fs.existsSync(filePath)) {
+          fs.removeSync(filePath);
+          console.log(chalk.red(`🗑️ Removed: ${path.relative(process.cwd(), filePath)}`));
+        }
+      });
+
+      ejectServerRoute(apiSrcDir, camel, isTS);
+      ejectWebAppRoute(webPagesDir, cap, camel, isTS);
+
+      console.log(chalk.green(`\n✅ Resource "${cap}" removed successfully!\n`));
     }
   });
 

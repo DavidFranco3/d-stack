@@ -6,11 +6,12 @@
   <img src="https://img.shields.io/badge/Vite-v8.1.5-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite Version" />
   <img src="https://img.shields.io/badge/Express-v4.22.1-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express Version" />
   <img src="https://img.shields.io/badge/MongoDB-v6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB Version" />
+  <img src="https://img.shields.io/badge/OpenAPI-3.0-85EA2D?style=for-the-badge&logo=openapiinitiative&logoColor=black" alt="OpenAPI Version" />
   <img src="https://img.shields.io/badge/License-ISC-ff69b4?style=for-the-badge" alt="License" />
 </p>
 
 > **Full-stack monolith framework — Express API + React 19 SPA + MongoDB.**
-> CLI-driven scaffolding with CRUD generation, Zod validation, JWT auth, and an opinionated layered architecture.
+> CLI-driven scaffolding with automatic route injection, CRUD & Auth generation, Zod validation, OpenAPI docs, SweetAlert2 notifications, and an opinionated layered architecture.
 
 ---
 
@@ -45,7 +46,9 @@ npm run dev
 | Command | Description |
 | :--- | :--- |
 | `dstack init [name]` | Scaffold a full-stack project (`-t ts` / `-t js`) |
-| `dstack g resource <Name>` | Generate model, service, controller, route & frontend page |
+| `dstack g resource <Name>` | Generate CRUD module, auto-inject routes, and create React page with Modals, Toasts & 3-dots Dropdown |
+| `dstack g auth` | Scaffold complete Auth module & UI (`RegisterPage`, `/api/auth`) |
+| `dstack remove resource <Name>` | Delete resource files and un-inject routes from `server.ts` & `App.tsx` |
 | `dstack g model\|service\|controller\|route\|middleware <Name>` | Scaffold a single layer |
 | `dstack doctor` | Check Node, npm, MongoDB, and project structure |
 | `dstack --version\|--help` | Version info and help |
@@ -54,7 +57,7 @@ npm run dev
 
 ### 📦 `dstack init`
 
-Creates the project structure with Express + Mongoose + Zod + Helmet (backend) and Vite + React 19 + Tailwind CSS (frontend).
+Creates the project structure with Express + Mongoose + Zod + Helmet + OpenAPI Docs (backend) and Vite + React 19 + Tailwind CSS + SweetAlert2 (frontend).
 
 ```bash
 dstack init my-app             # interactive mode
@@ -66,34 +69,57 @@ dstack init my-app -t js       # JavaScript, non-interactive
 
 ### ⚡ `dstack generate resource` (alias: `dstack g resource`)
 
-Generates a complete CRUD module for a given entity name. Creates all layers plus a React page with `ApexTable`.
+Generates a complete CRUD module for a given entity name. Creates all layers, auto-registers routes in `server.ts` & `App.tsx`, and generates an interactive React page with `ApexTable`, Modals, SweetAlert2 toasts, and a 3-dots (`MoreVertical`) dropdown menu.
 
 ```bash
 dstack g resource Product
 dstack g resource Invoice
 ```
 
-**📁 What it creates:**
+**📁 What it creates & registers:**
 
 ```text
 api/src/models/Product.ts           # 🍃 Mongoose model
-api/src/services/productService.ts    # ⚙️ Business logic
+api/src/services/productService.ts    # ⚙️ Business logic with pagination & search
 api/src/controllers/productController.ts # 🎮 HTTP handlers
 api/src/routes/productRoutes.ts      # 🛣️ Express routes + Zod validation
-web/src/pages/ProductPage.tsx        # 💻 React page with ApexTable
+web/src/pages/ProductPage.tsx        # 💻 React page with Modals, Swal & 3-dots Dropdown
+```
+
+**✨ Automatic Registration:**
+* Auto-registers route in `api/src/server.ts`: `app.use('/api/products', productRoutes);`
+* Auto-registers page in `web/src/App.tsx`: `<Route path="/products" element={<ProductPage />} />`
+
+---
+
+### 🔑 `dstack generate auth` (alias: `dstack g auth`)
+
+Scaffolds the full User Authentication & Account Registration flow:
+
+```bash
+dstack g auth
+```
+
+Creates `RegisterPage.tsx`, links `/register` in `App.tsx`, and wires up `/api/auth` endpoints.
+
+---
+
+### 🗑️ `dstack remove resource <Name>` (alias: `dstack rm resource <Name>`)
+
+Safely deletes all generated files for a resource and **un-injects** its routes from `server.ts` and `App.tsx`:
+
+```bash
+dstack remove resource Product
 ```
 
 ---
 
-### 🧱 Individual Scaffolding
+### 📄 Interactive OpenAPI / Swagger API Docs (`/api/docs`)
 
-```bash
-dstack g model Customer
-dstack g service Customer
-dstack g controller Customer
-dstack g route Customer
-dstack g middleware AuthGuard
-```
+Every D-Stack project comes with built-in interactive Swagger UI documentation out-of-the-box:
+
+* **Interactive UI:** `http://localhost:4000/api/docs`
+* **JSON Spec:** `http://localhost:4000/api/docs/json`
 
 ---
 
@@ -119,18 +145,18 @@ my-app/
 ├── ⚙️ api/                   # Express backend
 │   └── src/
 │       ├── config/        # MongoDB connection & seeders
-│       ├── controllers/   # Request handlers
+│       ├── controllers/   # Request handlers (Paginated)
 │       ├── services/      # Business logic
 │       ├── routes/        # Express routers + Zod schemas
 │       ├── models/        # Mongoose schemas
-│       ├── middleware/    # JWT auth, validation, logging, error handler
+│       ├── middleware/    # JWT auth, Zod error handler, logging
 │       ├── plugins/       # Mongoose plugins (soft-delete)
-│       └── server.ts      # Entry point
+│       └── server.ts      # Entry point with OpenAPI /api/docs
 ├── 🌐 web/                   # React SPA
 │   └── src/
 │       ├── api/           # fluent-rest-client instance
-│       ├── components/    # Shared components (AppLayout, etc.)
-│       ├── pages/         # Route pages
+│       ├── components/    # Dropdown (fixed z-99999), AppLayout, etc.
+│       ├── pages/         # Route pages (UsersPage, ProductPage, etc.)
 │       └── App.tsx        # Root component with router
 └── 📦 shared/                # Shared TypeScript interfaces
 ```
@@ -141,12 +167,13 @@ my-app/
 
 ## 📚 Included Libraries
 
-The project bundles three npm packages by the same author:
+The project bundles npm packages for full-stack monolith development:
 
 | Package | Purpose |
 | :--- | :--- |
 | 🔗 [`fluent-rest-client`](https://www.npmjs.com/package/fluent-rest-client) | Chainable HTTP client with JWT support |
 | 📊 [`react-apextable-pro`](https://www.npmjs.com/package/react-apextable-pro) | Data table with sticky columns, search, CSV/PDF export |
+| 🍬 [`sweetalert2`](https://sweetalert2.github.io/) | Dark-themed Toast notifications & confirm dialogs |
 | 💱 [`intl-currency-helper`](https://www.npmjs.com/package/intl-currency-helper) | Multi-currency formatter based on `Intl.NumberFormat` |
 
 ---
@@ -158,21 +185,7 @@ The project bundles three npm packages by the same author:
 | `npm run dev` 🚀 | Start API + Web concurrently (development) |
 | `npm run build` 🏗️ | Build Web (Vite) + API (tsc) |
 | `npm run start` ▶️ | Start production API server |
-| `npm test` 🧪 | Run API tests (vitest) |
-
----
-
-## 🌐 Deploy Documentation Site to GitHub Pages
-
-The `site/` directory contains the documentation landing page. To publish it:
-
-```bash
-git add site/
-git commit -m "docs: update documentation site"
-git subtree push --prefix site origin gh-pages
-```
-
-> 📌 Your site will be live at: `https://DavidFranco3.github.io/d-stack/`
+| `npm test` 🧪 | Run CLI test suite (`tests/cli.test.js`) |
 
 ---
 
