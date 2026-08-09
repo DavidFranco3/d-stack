@@ -45,13 +45,31 @@ document.addEventListener('DOMContentLoaded', () => {
 <span class="t-green">Created route: api/src/routes/productRoutes.ts</span>
 <span class="t-green">Created page: web/src/pages/ProductPage.tsx</span>
 
-<span class="t-magenta">Mount the route in server.ts:</span>
-   <span class="t-gray">import productRoutes from './routes/productRoutes.js';</span>
-   <span class="t-gray">app.use('/api/products', productRoutes);</span>
+<span class="t-green">✅ Auto-registered route in server.ts: app.use('/api/products', productRoutes)</span>
+<span class="t-green">✅ Auto-registered page in App.tsx: &lt;Route path="/products" element={&lt;ProductPage /&gt;} /&gt;</span>
+    `,
 
-<span class="t-magenta">Add the page to your router in App.tsx:</span>
-   <span class="t-gray">import ProductPage from './pages/ProductPage';</span>
-   <span class="t-gray">&lt;Route path="/products" element={&lt;ProductPage /&gt;} /&gt;</span>
+    auth: `
+<span class="t-cyan">$ dstack g auth</span>
+
+<span class="t-cyan">Scaffolding Auth Module...</span>
+
+<span class="t-green">Created page: web/src/pages/RegisterPage.tsx</span>
+<span class="t-green">✅ Auto-registered /register route in App.tsx</span>
+
+<span class="t-green">🎉 Auth Module successfully scaffolded!</span>
+    `,
+
+    remove: `
+<span class="t-cyan">$ dstack remove resource Product</span>
+
+<span class="t-magenta">🗑️ Removed: api/src/models/Product.ts</span>
+<span class="t-magenta">🗑️ Removed: api/src/services/productService.ts</span>
+<span class="t-magenta">🗑️ Removed: api/src/controllers/productController.ts</span>
+<span class="t-magenta">🗑️ Removed: api/src/routes/productRoutes.ts</span>
+<span class="t-magenta">🗑️ Removed: web/src/pages/ProductPage.tsx</span>
+
+<span class="t-green">✅ Resource "Product" removed successfully!</span>
     `,
 
     doctor: `
@@ -66,31 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 D-Stack System Diagnostic...
 
-  <span class="t-green">Node.js Version: v20.11.0 (>= 18.0.0)</span>
+  <span class="t-green">Node.js Version: v24.19.0 (>= 18.0.0)</span>
   <span class="t-green">npm Version: 10.2.4 (>= 9.0.0)</span>
   <span class="t-green">Workspace: D-Stack App detected</span>
   <span class="t-gray">Checking local MongoDB service (localhost:27017)...</span>
   <span class="t-green">MongoDB: Service detected running on port 27017</span>
 
 <span class="t-cyan">Diagnostic completed with 0 errors!</span>
-    `,
-
-    help: `
-<span class="t-cyan">$ dstack --help</span>
-
-Usage: dstack [options] [command]
-
-D-Stack CLI: Generate full-stack monolith applications and components
-
-Options:
-  <span class="t-yellow">-V, --version</span>                output the version number
-  <span class="t-yellow">-h, --help</span>                   display help for command
-
-Commands:
-  <span class="t-green">init [options] [name]</span>        Initialize a new D-Stack project
-  <span class="t-green">generate|g &lt;type&gt; &lt;name&gt;</span>     Generate components or full CRUD resources
-  <span class="t-green">doctor</span>                       Run system diagnostics
-  <span class="t-green">help [command]</span>               Display help for command
     `
   };
 
@@ -191,12 +191,57 @@ Commands:
           <code>dstack g resource Product<br>dstack g resource Invoice</code>
         </div>
 
-        <div class="cmd-subtitle">Files Created:</div>
+        <div class="cmd-subtitle">Files Created & Auto-Injected:</div>
         <div class="cmd-tree">1. Model:      api/src/models/Product.ts
 2. Service:    api/src/services/productService.ts
 3. Controller: api/src/controllers/productController.ts
-4. Routes:     api/src/routes/productRoutes.ts
-5. Page:       web/src/pages/ProductPage.tsx</div>
+4. Routes:     api/src/routes/productRoutes.ts (Auto-injected into server.ts)
+5. Page:       web/src/pages/ProductPage.tsx (Auto-injected into App.tsx)</div>
+      </div>
+    `,
+
+    auth: `
+      <div class="cmd-header">
+        <div class="cmd-tag tag-pro">Authentication</div>
+        <h3 class="cmd-title"><code>dstack g auth</code></h3>
+      </div>
+      <p class="cmd-desc">
+        Scaffolds a complete Authentication & Account Registration flow with backend endpoints and React UI.
+      </p>
+
+      <div class="cmd-details">
+        <div class="cmd-subtitle">Examples:</div>
+        <div class="code-block">
+          <code>dstack generate auth<br>dstack g auth</code>
+        </div>
+
+        <div class="cmd-subtitle">Files Created & Auto-Injected:</div>
+        <div class="cmd-tree">1. Page:   web/src/pages/RegisterPage.tsx
+2. Route:  Auto-registered /register in App.tsx
+3. Endpoints: /api/auth/register & /api/auth/login</div>
+      </div>
+    `,
+
+    remove: `
+      <div class="cmd-header">
+        <div class="cmd-tag">Cleanup Utility</div>
+        <h3 class="cmd-title"><code>dstack remove resource &lt;Name&gt;</code></h3>
+      </div>
+      <p class="cmd-desc">
+        Safely deletes all generated files for a resource and automatically un-injects imports and routes from server.ts and App.tsx.
+      </p>
+
+      <div class="cmd-details">
+        <div class="cmd-subtitle">Aliases:</div>
+        <ul class="cmd-list">
+          <li><code>dstack remove resource &lt;Name&gt;</code></li>
+          <li><code>dstack rm resource &lt;Name&gt;</code></li>
+        </ul>
+
+        <div class="cmd-subtitle">Example:</div>
+        <div class="code-block">
+          <code>dstack rm resource Product</code>
+        </div>
       </div>
     `,
 
@@ -216,7 +261,7 @@ Commands:
         </div>
 
         <div class="cmd-subtitle">Sample Output:</div>
-        <div class="cmd-tree">[OK] Node.js Version: v20.11.0 (>= 18.0.0)
+        <div class="cmd-tree">[OK] Node.js Version: v24.19.0 (>= 18.0.0)
 [OK] npm Version: 10.2.4 (>= 9.0.0)
 [OK] MongoDB Connection: OK (mongodb://127.0.0.1:27017)
 [OK] Monolith Structure: Valid (api, web, shared)</div>
