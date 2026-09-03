@@ -10,9 +10,9 @@ const __dirname = path.dirname(__filename);
 const cliPath = path.resolve(__dirname, '../cli/index.js');
 
 describe('⚡ D-Stack CLI Tests', () => {
-  test('CLI --version returns version number 1.2.0', () => {
+  test('CLI --version returns version number 1.2.1', () => {
     const output = execSync(`node "${cliPath}" --version`, { encoding: 'utf-8' });
-    assert.strictEqual(output.trim(), '1.2.0');
+    assert.strictEqual(output.trim(), '1.2.1');
   });
 
   test('CLI --help lists available commands', () => {

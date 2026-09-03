@@ -29,7 +29,7 @@ const showBanner = () => {
 program
   .name('dstack')
   .description('D-Stack CLI: Generate full-stack monolith applications and components')
-  .version('1.2.0');
+  .version('1.2.1');
 
 // Initialize Command
 program
