@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Mail, Lock, ChevronRight, AlertCircle } from 'lucide-react';
+import { Zap, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { api } from '../api/client';
 
 export default function Login({ onLogin }) {
@@ -32,27 +32,25 @@ export default function Login({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="grid-bg" />
-      <div className="glow glow-top-left" />
-      <div className="glow glow-bottom-right" />
       
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         className="auth-card glass-card"
       >
         <div className="auth-header">
           <div className="auth-logo-badge">
-            <Rocket size={26} color="white" />
+            <Zap size={22} color="#000" strokeWidth={2.5} />
           </div>
-          <h1 className="auth-title">Bienvenido a <span className="gradient-text">D-Stack</span></h1>
-          <p className="auth-subtitle">Ingresa tus credenciales para acceder al monolito</p>
+          <h1 className="auth-title">Acceso <span className="text-[#ffd000]">D-Stack</span></h1>
+          <p className="auth-subtitle">Ingresa tus credenciales para administrar el monolito</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">Correo Electrónico</label>
             <div className="input-wrapper">
-              <Mail className="input-icon" size={18} />
+              <Mail className="input-icon" size={16} />
               <input 
                 type="email" 
                 value={email}
@@ -67,7 +65,7 @@ export default function Login({ onLogin }) {
           <div className="form-group">
             <label className="form-label">Contraseña</label>
             <div className="input-wrapper">
-              <Lock className="input-icon" size={18} />
+              <Lock className="input-icon" size={16} />
               <input 
                 type="password" 
                 value={password}
@@ -81,11 +79,11 @@ export default function Login({ onLogin }) {
 
           {error && (
             <motion.div 
-              initial={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               className="alert-error"
             >
-              <AlertCircle size={16} />
+              <AlertCircle size={15} />
               <span>{error}</span>
             </motion.div>
           )}
@@ -93,10 +91,10 @@ export default function Login({ onLogin }) {
           <button 
             type="submit" 
             disabled={loading}
-            className="btn-primary"
+            className="btn-primary mt-2"
           >
             <span>{loading ? 'Autenticando...' : 'Iniciar Sesión'}</span>
-            {!loading && <ChevronRight size={18} />}
+            {!loading && <ArrowRight size={16} />}
           </button>
         </form>
       </motion.div>

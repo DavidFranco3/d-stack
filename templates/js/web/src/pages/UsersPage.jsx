@@ -11,8 +11,8 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#12161f',
-  color: '#ffffff',
+  background: '#0e1117',
+  color: '#f8fafc',
 });
 
 export default function UsersPage() {
@@ -90,37 +90,37 @@ export default function UsersPage() {
       text: `¿Estás seguro de deshabilitar a ${user.name}?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#e11d48',
-      cancelButtonColor: '#334155',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonColor: '#f43f5e',
+      cancelButtonColor: '#1e2430',
+      confirmButtonText: 'Sí, deshabilitar',
       cancelButtonText: 'Cancelar',
-      background: '#12161f',
+      background: '#0e1117',
       color: '#ffffff',
     });
 
     if (result.isConfirmed) {
-      setUsers(users.filter(u => u._id !== user._id && u.id !== user.id));
-      Toast.fire({ icon: 'success', title: 'Usuario eliminado' });
+      setUsers(users.filter(u => (u._id || u.id) !== (user._id || user.id)));
+      Toast.fire({ icon: 'success', title: 'Usuario deshabilitado' });
     }
   };
 
   const columnas = [
-    { name: 'ID', selector: row => row._id || row.id || '', sortable: true, cell: row => <span className="font-mono text-cyan-400 font-semibold">{row._id || row.id}</span> },
-    { name: 'Nombre', selector: row => row.name, sortable: true, cell: row => <span className="font-semibold text-white">{row.name}</span> },
-    { name: 'Email', selector: row => row.email, sortable: true, cell: row => <span className="text-slate-300 font-mono">{row.email}</span> },
-    { name: 'Rol', selector: row => row.role, cell: row => <span className="bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2.5 py-1 rounded-md text-xs font-semibold">{row.role}</span> },
-    { name: 'Estado', cell: row => <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1"><UserCheck size={14} /> Activo ({row.status || 1})</span> },
+    { name: 'Identificador', selector: row => row._id || row.id || '-', cell: row => <span className="font-mono text-xs text-slate-400">{row._id || row.id}</span> },
+    { name: 'Nombre', selector: row => row.name, sortable: true, cell: row => <span className="font-semibold text-white text-xs">{row.name}</span> },
+    { name: 'Correo Electrónico', selector: row => row.email, sortable: true, cell: row => <span className="font-mono text-slate-300 text-xs">{row.email}</span> },
+    { name: 'Rol', selector: row => row.role, cell: row => <span className="bg-[#181d28] text-[#38bdf8] border border-[#242b39] px-2 py-0.5 rounded text-xs font-mono font-semibold">{row.role}</span> },
+    { name: 'Estado', cell: row => <span className="text-[#10b981] font-mono text-xs flex items-center gap-1"><UserCheck size={13} /> Activo ({row.status || 1})</span> },
     {
       name: 'Acciones',
       cell: row => (
         <Dropdown>
           <Dropdown.Trigger />
           <Dropdown.Content>
-            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-cyan-300">
-              <Edit2 size={15} /> Editar
+            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-[#ffd000]">
+              <Edit2 size={13} /> Editar
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleDelete(row)} className="text-rose-400">
-              <Trash2 size={15} /> Eliminar
+            <Dropdown.Item onClick={() => handleDelete(row)} className="text-[#f43f5e]">
+              <Trash2 size={13} /> Deshabilitar
             </Dropdown.Item>
           </Dropdown.Content>
         </Dropdown>
@@ -129,52 +129,53 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-[#12161f]/90 p-6 rounded-3xl border border-white/10 flex items-center justify-between shadow-2xl">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="bg-[#0e1117] p-6 rounded-xl border border-[#1c222d] flex items-center justify-between shadow-2xl">
         <div>
-          <h2 className="font-outfit font-bold text-xl text-white flex items-center gap-2">
-            <Users size={22} className="text-cyan-400" />
+          <h1 className="font-display font-bold text-xl text-white flex items-center gap-2">
+            <Users size={20} className="text-[#ffd000]" />
             Gestión de Usuarios
-          </h2>
+          </h1>
           <p className="text-xs text-slate-400 mt-1">Administración de usuarios, cuentas y roles del monolito</p>
         </div>
-        <button onClick={handleOpenCreate} className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition flex items-center gap-2">
-          <Plus size={16} /> Nuevo Usuario
+        <button onClick={handleOpenCreate} className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md shadow-sm transition-colors flex items-center gap-2 cursor-pointer">
+          <Plus size={15} />
+          <span>Nuevo Usuario</span>
         </button>
       </div>
 
-      <div className="bg-[#12161f]/90 rounded-3xl border border-white/10 p-6 shadow-2xl">
+      <div className="bg-[#0e1117] rounded-xl border border-[#1c222d] p-6 shadow-2xl">
         <ApexTable datos={users} columnas={columnas} storagePrefix="dstack_users_" pagination />
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#12161f] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-4">{editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-lg font-display font-bold text-white mb-4">{editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Nombre Completo</label>
-                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="Ej. Ana Franco" />
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Nombre Completo</label>
+                <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#07090d] text-white px-3.5 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]" placeholder="Ej. Ana Franco" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Correo Electrónico</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="usuario@dstack.com" />
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Correo Electrónico</label>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#07090d] text-white px-3.5 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]" placeholder="usuario@dstack.com" />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Contraseña</label>
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder={editingUser ? 'Dejar en blanco para mantener' : '••••••••'} />
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Contraseña</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#07090d] text-white px-3.5 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]" placeholder={editingUser ? 'Dejar en blanco para mantener' : '••••••••'} />
               </div>
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Rol de Usuario</label>
-                <select value={role} onChange={e => setRole(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500">
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Rol de Usuario</label>
+                <select value={role} onChange={e => setRole(e.target.value)} className="w-full bg-[#07090d] text-white px-3 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]">
                   <option value="Administrador">Administrador</option>
                   <option value="Desarrollador">Desarrollador</option>
                   <option value="Usuario">Usuario</option>
                 </select>
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white transition">Cancelar</button>
-                <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[#1c222d] mt-5">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-3.5 py-2 text-slate-400 hover:text-white text-xs transition-colors cursor-pointer">Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md transition-colors cursor-pointer">
                   {editingUser ? 'Guardar Cambios' : 'Registrar'}
                 </button>
               </div>

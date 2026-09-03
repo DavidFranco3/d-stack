@@ -97,9 +97,9 @@ D-Stack System Diagnostic...
   const style = document.createElement('style');
   style.innerHTML = `
     .t-cyan { color: #38bdf8; font-weight: 600; }
-    .t-green { color: #34d399; font-weight: 600; }
-    .t-yellow { color: #fbbf24; font-weight: 600; }
-    .t-magenta { color: #f472b6; font-weight: 600; }
+    .t-green { color: #10b981; font-weight: 600; }
+    .t-yellow { color: #ffd000; font-weight: 600; }
+    .t-magenta { color: #f43f5e; font-weight: 600; }
     .t-gray { color: #64748b; }
   `;
   document.head.appendChild(style);

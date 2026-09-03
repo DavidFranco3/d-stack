@@ -29,6 +29,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+      - name: Install root dependencies
+        run: npm ci
       - name: Scaffold project and generate a resource
         run: |
           node cli/index.js init ci-app -t ts

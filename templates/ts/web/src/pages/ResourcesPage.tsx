@@ -244,7 +244,7 @@ export default function ResourcesPage() {
             <>
               <button
                 onClick={() => handleOpenEdit(row)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/40 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#ffd000]/10 hover:bg-[#ffd000]/20 border border-[#ffd000]/30 text-[#ffd000] text-xs font-semibold transition-colors cursor-pointer"
                 title="Modificar Recurso"
               >
                 <Edit3 size={13} />
@@ -253,7 +253,7 @@ export default function ResourcesPage() {
 
               <button
                 onClick={() => handleSoftDelete(row)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-200 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#f43f5e]/10 hover:bg-[#f43f5e]/20 border border-[#f43f5e]/30 text-[#f43f5e] text-xs font-semibold transition-colors cursor-pointer"
                 title="Eliminación Lógica (status: 1 -> 0)"
               >
                 <Trash2 size={13} />
@@ -263,7 +263,7 @@ export default function ResourcesPage() {
           ) : (
             <button
               onClick={() => handleRestore(row)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#10b981]/10 hover:bg-[#10b981]/20 border border-[#10b981]/30 text-[#10b981] text-xs font-semibold transition-colors cursor-pointer"
               title="Restaurar (status: 0 -> 1)"
             >
               <RefreshCw size={13} />
@@ -278,35 +278,33 @@ export default function ResourcesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       {/* Page Hero Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950/50 to-slate-900 border border-white/10 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        
+      <div className="relative overflow-hidden rounded-xl bg-[#0e1117] border border-[#1c222d] p-6 sm:p-7 shadow-2xl">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
-              <Layers size={14} />
-              <span>Módulo Monolito CRUD</span>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-[#ffd000]/10 border border-[#ffd000]/30 text-[#ffd000] text-xs font-mono font-semibold">
+              <Layers size={13} />
+              <span>MÓDULO MONOLITO CRUD</span>
             </div>
-            <h1 className="font-outfit font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+            <h1 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
               Gestión de Recursos y Finanzas
             </h1>
-            <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
               Administración completa con inserción modal, modificación, eliminación lógica (soft delete) e integración de las 3 librerías de David Franco.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto shrink-0">
             {/* Active vs Deleted Filter Pills */}
-            <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 text-xs font-semibold shadow-inner">
+            <div className="flex bg-[#07090d] p-1 rounded-lg border border-[#1c222d] text-xs font-mono shadow-inner">
               <button
                 onClick={() => setFilterMode('active')}
-                className={`px-4 py-2 rounded-xl transition-all ${filterMode === 'active' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30 font-bold' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-1.5 rounded-md transition-colors ${filterMode === 'active' ? 'bg-[#ffd000]/15 text-[#ffd000] border border-[#ffd000]/30 font-bold' : 'text-slate-400 hover:text-white'}`}
               >
                 Activos ({activeItems.length})
               </button>
               <button
                 onClick={() => setFilterMode('deleted')}
-                className={`px-4 py-2 rounded-xl transition-all ${filterMode === 'deleted' ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/30 font-bold' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-1.5 rounded-md transition-colors ${filterMode === 'deleted' ? 'bg-[#f43f5e]/15 text-[#f43f5e] border border-[#f43f5e]/30 font-bold' : 'text-slate-400 hover:text-white'}`}
               >
                 Papelera ({deletedItems.length})
               </button>
@@ -315,9 +313,9 @@ export default function ResourcesPage() {
             {/* Trigger Insert Modal */}
             <button
               onClick={handleOpenCreate}
-              className="py-2.5 px-5 text-xs font-bold rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-xl shadow-indigo-500/25 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+              className="py-2 px-4 text-xs font-bold rounded-md bg-[#ffd000] hover:bg-[#ffe45e] text-black shadow-md shadow-[#ffd000]/20 flex items-center gap-2 transition-colors cursor-pointer"
             >
-              <Plus size={16} />
+              <Plus size={15} />
               <span>Nuevo Recurso</span>
             </button>
           </div>
@@ -325,36 +323,36 @@ export default function ResourcesPage() {
       </div>
 
       {/* KPI Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="glass-card p-5 border border-white/10 rounded-2xl bg-[#12161f]/80 flex items-center justify-between shadow-xl">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-5 border border-[#1c222d] rounded-xl bg-[#0e1117] flex items-center justify-between shadow-xl">
           <div className="space-y-1">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Valor Total Activo</span>
-            <p className="font-outfit font-extrabold text-2xl text-emerald-400">
+            <span className="text-[11px] font-mono font-medium text-slate-400 uppercase tracking-wider">Valor Total Activo</span>
+            <p className="font-display font-bold text-2xl text-[#10b981]">
               {formatCurrency(totalValue, { currency: 'USD' })}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-            <DollarSign size={24} />
+          <div className="w-10 h-10 rounded-lg bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] flex items-center justify-center">
+            <DollarSign size={20} />
           </div>
         </div>
 
-        <div className="glass-card p-5 border border-white/10 rounded-2xl bg-[#12161f]/80 flex items-center justify-between shadow-xl">
+        <div className="p-5 border border-[#1c222d] rounded-xl bg-[#0e1117] flex items-center justify-between shadow-xl">
           <div className="space-y-1">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Recursos Activos</span>
-            <p className="font-outfit font-extrabold text-2xl text-indigo-400">{activeItems.length}</p>
+            <span className="text-[11px] font-mono font-medium text-slate-400 uppercase tracking-wider">Recursos Activos</span>
+            <p className="font-display font-bold text-2xl text-[#ffd000]">{activeItems.length}</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-            <Package size={24} />
+          <div className="w-10 h-10 rounded-lg bg-[#ffd000]/10 border border-[#ffd000]/20 text-[#ffd000] flex items-center justify-center">
+            <Package size={20} />
           </div>
         </div>
 
-        <div className="glass-card p-5 border border-white/10 rounded-2xl bg-[#12161f]/80 flex items-center justify-between shadow-xl">
+        <div className="p-5 border border-[#1c222d] rounded-xl bg-[#0e1117] flex items-center justify-between shadow-xl">
           <div className="space-y-1">
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">En Papelera</span>
-            <p className="font-outfit font-extrabold text-2xl text-rose-400">{deletedItems.length}</p>
+            <span className="text-[11px] font-mono font-medium text-slate-400 uppercase tracking-wider">En Papelera</span>
+            <p className="font-display font-bold text-2xl text-[#f43f5e]">{deletedItems.length}</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
-            <Archive size={24} />
+          <div className="w-10 h-10 rounded-lg bg-[#f43f5e]/10 border border-[#f43f5e]/20 text-[#f43f5e] flex items-center justify-center">
+            <Archive size={20} />
           </div>
         </div>
       </div>
@@ -399,7 +397,7 @@ export default function ResourcesPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ej. Servidor de Caché Redis"
-                  className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                  className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                   required
                 />
               </div>
@@ -409,7 +407,7 @@ export default function ResourcesPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                  className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                 >
                   <option value="General">General</option>
                   <option value="Backend">Backend</option>
@@ -428,7 +426,7 @@ export default function ResourcesPage() {
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="250.00"
-                    className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                    className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                     required
                   />
                 </div>
@@ -438,7 +436,7 @@ export default function ResourcesPage() {
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="form-input pl-3 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                    className="form-input pl-2 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                   >
                     <option value="USD">USD</option>
                     <option value="MXN">MXN</option>
@@ -447,15 +445,15 @@ export default function ResourcesPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[#1c222d] mt-5">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:bg-white/5 transition-colors"
+                  className="px-4 py-2 rounded-md text-xs font-semibold text-slate-400 hover:bg-white/[0.05] transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="py-2.5 px-6 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 transition-all">
+                <button type="submit" className="py-2 px-5 text-xs font-bold rounded-md bg-[#ffd000] hover:bg-[#ffe45e] text-black shadow-md shadow-[#ffd000]/20 transition-colors cursor-pointer">
                   Guardar Recurso
                 </button>
               </div>
@@ -467,16 +465,16 @@ export default function ResourcesPage() {
       {/* EDIT MODAL */}
       {showEditModal && editingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="glass-card w-full max-w-lg p-7 border border-white/15 rounded-3xl shadow-2xl relative bg-[#12161f]">
-            <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
-                  <Edit3 size={18} />
+          <div className="w-full max-w-lg p-6 border border-[#1c222d] rounded-xl shadow-2xl relative bg-[#0e1117]">
+            <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#1c222d]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#ffd000]/10 text-[#ffd000] flex items-center justify-center border border-[#ffd000]/25">
+                  <Edit3 size={15} />
                 </div>
-                <h3 className="font-outfit font-bold text-xl text-white">Modificar Recurso</h3>
+                <h3 className="font-display font-bold text-lg text-white">Modificar Recurso</h3>
               </div>
-              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-colors">
-                <X size={20} />
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white p-1 rounded hover:bg-white/[0.05] transition-colors cursor-pointer">
+                <X size={18} />
               </button>
             </div>
 
@@ -487,7 +485,7 @@ export default function ResourcesPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                  className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                   required
                 />
               </div>
@@ -497,7 +495,7 @@ export default function ResourcesPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                  className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                 >
                   <option value="General">General</option>
                   <option value="Backend">Backend</option>
@@ -515,7 +513,7 @@ export default function ResourcesPage() {
                     step="0.01"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="form-input pl-4 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                    className="form-input pl-3 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                     required
                   />
                 </div>
@@ -525,7 +523,7 @@ export default function ResourcesPage() {
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
-                    className="form-input pl-3 bg-slate-900/90 text-white border border-white/10 rounded-xl"
+                    className="form-input pl-2 bg-[#07090d] text-white border border-[#1c222d] rounded-md text-xs focus:border-[#ffd000]"
                   >
                     <option value="USD">USD</option>
                     <option value="MXN">MXN</option>
@@ -534,15 +532,15 @@ export default function ResourcesPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[#1c222d] mt-5">
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:bg-white/5 transition-colors"
+                  className="px-4 py-2 rounded-md text-xs font-semibold text-slate-400 hover:bg-white/[0.05] transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
-                <button type="submit" className="py-2.5 px-6 text-xs font-bold rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25 transition-all">
+                <button type="submit" className="py-2 px-5 text-xs font-bold rounded-md bg-[#ffd000] hover:bg-[#ffe45e] text-black shadow-md shadow-[#ffd000]/20 transition-colors cursor-pointer">
                   Actualizar Registro
                 </button>
               </div>

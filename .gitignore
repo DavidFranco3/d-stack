@@ -36,3 +36,8 @@ lerna-debug.log*
 templates/**/node_modules/
 templates/**/dist/
 templates/**/.env
+
+# AI Agent skills & tooling
+.agents/
+skills-lock.json
+

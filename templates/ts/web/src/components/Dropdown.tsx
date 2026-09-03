@@ -60,10 +60,10 @@ export function DropdownTrigger({ children }: { children?: ReactNode }) {
   if (!context) return null;
 
   return (
-    <div onClick={context.toggleOpen} className="cursor-pointer">
+    <div onClick={context.toggleOpen} className="cursor-pointer inline-flex">
       {children || (
-        <button type="button" className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition focus:outline-none">
-          <MoreVertical size={18} />
+        <button type="button" className="p-1.5 rounded text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors focus:outline-none cursor-pointer">
+          <MoreVertical size={16} />
         </button>
       )}
     </div>
@@ -89,7 +89,7 @@ export function DropdownContent({ children, align = 'right' }: { children: React
   return (
     <div
       style={style}
-      className="w-44 rounded-2xl bg-[#12161f] border border-white/15 shadow-2xl py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+      className="w-44 rounded-lg bg-[#0e1117] border border-[#1c222d] shadow-2xl py-1 overflow-hidden font-sans"
       onClick={() => context.setOpen(false)}
     >
       {children}
@@ -102,7 +102,7 @@ export function DropdownItem({ children, onClick, className = '' }: { children: 
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 flex items-center gap-2 transition ${className}`}
+      className={`w-full text-left px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-[#161a22] flex items-center gap-2 transition-colors cursor-pointer ${className}`}
     >
       {children}
     </button>

@@ -572,8 +572,8 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#12161f',
-  color: '#ffffff',
+  background: '#0e1117',
+  color: '#f8fafc',
 });
 
 export default function ${cap}Page() {
@@ -623,7 +623,7 @@ export default function ${cap}Page() {
         setIsModalOpen(false);
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#0e1117', color: '#fff' });
       }
     } else {
       const res: any = await api.resource('${camel}s').safe().post({ name: nameInput });
@@ -632,7 +632,7 @@ export default function ${cap}Page() {
         setIsModalOpen(false);
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#0e1117', color: '#fff' });
       }
     }
   };
@@ -644,10 +644,11 @@ export default function ${cap}Page() {
       text: 'Do you want to delete this ${camel}?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#e11d48',
-      cancelButtonColor: '#334155',
+      confirmButtonColor: '#f43f5e',
+      cancelButtonColor: '#1e2430',
       confirmButtonText: 'Yes, delete it!',
-      background: '#12161f',
+      cancelButtonText: 'Cancel',
+      background: '#0e1117',
       color: '#ffffff',
     });
 
@@ -657,7 +658,7 @@ export default function ${cap}Page() {
         Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#0e1117', color: '#fff' });
       }
     }
   };
@@ -670,10 +671,10 @@ export default function ${cap}Page() {
         <Dropdown>
           <Dropdown.Trigger />
           <Dropdown.Content>
-            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-cyan-300">
+            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-[#ffd000]">
               <Edit2 size={15} /> Edit
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-rose-400">
+            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-[#f43f5e]">
               <Trash2 size={15} /> Delete
             </Dropdown.Item>
           </Dropdown.Content>
@@ -683,34 +684,37 @@ export default function ${cap}Page() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-outfit font-extrabold text-2xl text-white">${cap} Management</h1>
-          <button onClick={handleOpenCreate} className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition">
-            + New ${cap}
-          </button>
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 shadow-2xl flex items-center justify-between">
+        <div>
+          <h1 className="font-display font-bold text-xl text-white">${cap} Management</h1>
+          <p className="text-xs text-slate-400 mt-1">Manage ${camel} resources</p>
         </div>
+        <button onClick={handleOpenCreate} className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md shadow-sm transition-colors cursor-pointer">
+          + New ${cap}
+        </button>
+      </div>
 
+      <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 shadow-2xl">
         {loading ? (
-          <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
+          <div className="py-16 text-center text-slate-400 text-xs font-mono">Loading...</div>
         ) : (
           <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
         )}
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#12161f] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-lg font-display font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Name</label>
-                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="Enter name..." />
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Name</label>
+                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#07090d] text-white px-3.5 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]" placeholder="Enter name..." />
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
-                <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[#1c222d] mt-5">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-3.5 py-2 text-slate-400 hover:text-white text-xs transition-colors cursor-pointer">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md transition-colors cursor-pointer">
                   {editingItem ? 'Save Changes' : 'Create'}
                 </button>
               </div>
@@ -736,8 +740,8 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#12161f',
-  color: '#ffffff',
+  background: '#0e1117',
+  color: '#f8fafc',
 });
 
 export default function ${cap}Page() {
@@ -787,7 +791,7 @@ export default function ${cap}Page() {
         setIsModalOpen(false);
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to update item', background: '#0e1117', color: '#fff' });
       }
     } else {
       const res = await api.resource('${camel}s').safe().post({ name: nameInput });
@@ -796,7 +800,7 @@ export default function ${cap}Page() {
         setIsModalOpen(false);
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to create item', background: '#0e1117', color: '#fff' });
       }
     }
   };
@@ -808,10 +812,11 @@ export default function ${cap}Page() {
       text: 'Do you want to delete this ${camel}?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#e11d48',
-      cancelButtonColor: '#334155',
+      confirmButtonColor: '#f43f5e',
+      cancelButtonColor: '#1e2430',
       confirmButtonText: 'Yes, delete it!',
-      background: '#12161f',
+      cancelButtonText: 'Cancel',
+      background: '#0e1117',
       color: '#ffffff',
     });
 
@@ -821,7 +826,7 @@ export default function ${cap}Page() {
         Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
         fetchItems();
       } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#12161f', color: '#fff' });
+        Swal.fire({ icon: 'error', title: 'Error', text: res.data?.message || 'Failed to delete item', background: '#0e1117', color: '#fff' });
       }
     }
   };
@@ -834,10 +839,10 @@ export default function ${cap}Page() {
         <Dropdown>
           <Dropdown.Trigger />
           <Dropdown.Content>
-            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-cyan-300">
+            <Dropdown.Item onClick={() => handleOpenEdit(row)} className="text-[#ffd000]">
               <Edit2 size={15} /> Edit
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-rose-400">
+            <Dropdown.Item onClick={() => handleDelete(row._id)} className="text-[#f43f5e]">
               <Trash2 size={15} /> Delete
             </Dropdown.Item>
           </Dropdown.Content>
@@ -847,34 +852,37 @@ export default function ${cap}Page() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-[#12161f]/90 border border-white/10 rounded-3xl p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-outfit font-extrabold text-2xl text-white">${cap} Management</h1>
-          <button onClick={handleOpenCreate} className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition">
-            + New ${cap}
-          </button>
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 shadow-2xl flex items-center justify-between">
+        <div>
+          <h1 className="font-display font-bold text-xl text-white">${cap} Management</h1>
+          <p className="text-xs text-slate-400 mt-1">Manage ${camel} resources</p>
         </div>
+        <button onClick={handleOpenCreate} className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md shadow-sm transition-colors cursor-pointer">
+          + New ${cap}
+        </button>
+      </div>
 
+      <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 shadow-2xl">
         {loading ? (
-          <div className="py-16 text-center text-slate-400 text-sm">Loading...</div>
+          <div className="py-16 text-center text-slate-400 text-xs font-mono">Loading...</div>
         ) : (
           <ApexTable datos={items} columnas={columns} storagePrefix="dstack_${camel}_" pagination />
         )}
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-[#12161f] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-[#0e1117] border border-[#1c222d] rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-lg font-display font-bold text-white mb-4">{editingItem ? 'Edit ${cap}' : 'Create ${cap}'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-400 text-sm mb-1">Name</label>
-                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" placeholder="Enter name..." />
+                <label className="block text-slate-400 text-xs font-mono mb-1 uppercase tracking-wider">Name</label>
+                <input type="text" required value={nameInput} onChange={e => setNameInput(e.target.value)} className="w-full bg-[#07090d] text-white px-3.5 py-2 text-xs rounded-md border border-[#1c222d] focus:outline-none focus:border-[#ffd000]" placeholder="Enter name..." />
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-400 hover:text-white transition">Cancel</button>
-                <button type="submit" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl transition">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-[#1c222d] mt-5">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-3.5 py-2 text-slate-400 hover:text-white text-xs transition-colors cursor-pointer">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#ffd000] hover:bg-[#ffe45e] text-black font-bold text-xs rounded-md transition-colors cursor-pointer">
                   {editingItem ? 'Save Changes' : 'Create'}
                 </button>
               </div>
@@ -1019,6 +1027,7 @@ function generateRegisterPage(isTS) {
   if (isTS) {
     return `import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Zap, Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { api } from '../api/client';
 
 export default function RegisterPage() {
@@ -1039,39 +1048,88 @@ export default function RegisterPage() {
         // The API sets an httpOnly session cookie; just enter the app.
         window.location.href = '/dashboard';
       } else {
-        setError(res.error?.message || res.data?.message || 'Registration failed');
+        setError(res.error?.message || res.data?.message || 'Error en el registro');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
+      setError(err.message || 'Error de conexión durante el registro');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#12161f]/90 border border-white/10 rounded-3xl p-8 shadow-2xl">
-        <h2 className="font-outfit text-3xl font-extrabold text-white text-center mb-6">Create Account</h2>
-        {error && <div className="p-3 mb-4 rounded-xl bg-red-500/20 text-red-300 text-sm border border-red-500/30">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Full Name</label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+    <div className="auth-container">
+      <div className="grid-bg" />
+      <div className="auth-card glass-card">
+        <div className="auth-header">
+          <div className="auth-logo-badge">
+            <Zap size={22} color="#000" strokeWidth={2.5} />
           </div>
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Email</label>
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          <h1 className="auth-title">Crear Cuenta <span className="text-[#ffd000]">D-Stack</span></h1>
+          <p className="auth-subtitle">Regístrate para comenzar a administrar el monolito</p>
+        </div>
+
+        {error && (
+          <div className="alert-error">
+            <AlertCircle size={15} />
+            <span>{error}</span>
           </div>
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Password</label>
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Nombre Completo</label>
+            <div className="input-wrapper">
+              <User className="input-icon" size={16} />
+              <input 
+                type="text" 
+                required 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                className="form-input" 
+                placeholder="Tu Nombre" 
+              />
+            </div>
           </div>
-          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition">
-            {loading ? 'Registering...' : 'Register'}
+
+          <div className="form-group">
+            <label className="form-label">Correo Electrónico</label>
+            <div className="input-wrapper">
+              <Mail className="input-icon" size={16} />
+              <input 
+                type="email" 
+                required 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                className="form-input" 
+                placeholder="usuario@dstack.com" 
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Contraseña</label>
+            <div className="input-wrapper">
+              <Lock className="input-icon" size={16} />
+              <input 
+                type="password" 
+                required 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="form-input" 
+                placeholder="••••••••" 
+              />
+            </div>
+          </div>
+
+          <button type="submit" disabled={loading} className="btn-primary mt-2">
+            <span>{loading ? 'Registrando...' : 'Crear Cuenta'}</span>
+            {!loading && <ArrowRight size={16} />}
           </button>
         </form>
-        <p className="text-center text-slate-400 text-sm mt-6">
-          Already have an account? <Link to="/login" className="text-cyan-400 font-semibold hover:underline">Log in</Link>
+
+        <p className="text-center text-slate-400 text-xs mt-6">
+          ¿Ya tienes cuenta? <Link to="/login" className="text-[#ffd000] font-semibold hover:underline">Iniciar Sesión</Link>
         </p>
       </div>
     </div>
@@ -1081,6 +1139,7 @@ export default function RegisterPage() {
   } else {
     return `import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Zap, Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { api } from '../api/client';
 
 export default function RegisterPage() {
@@ -1101,39 +1160,88 @@ export default function RegisterPage() {
         // The API sets an httpOnly session cookie; just enter the app.
         window.location.href = '/dashboard';
       } else {
-        setError(res.error?.message || res.data?.message || 'Registration failed');
+        setError(res.error?.message || res.data?.message || 'Error en el registro');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred during registration');
+      setError(err.message || 'Error de conexión durante el registro');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-[#12161f]/90 border border-white/10 rounded-3xl p-8 shadow-2xl">
-        <h2 className="font-outfit text-3xl font-extrabold text-white text-center mb-6">Create Account</h2>
-        {error && <div className="p-3 mb-4 rounded-xl bg-red-500/20 text-red-300 text-sm border border-red-500/30">{error}</div>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Full Name</label>
-            <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+    <div className="auth-container">
+      <div className="grid-bg" />
+      <div className="auth-card glass-card">
+        <div className="auth-header">
+          <div className="auth-logo-badge">
+            <Zap size={22} color="#000" strokeWidth={2.5} />
           </div>
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Email</label>
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+          <h1 className="auth-title">Crear Cuenta <span className="text-[#ffd000]">D-Stack</span></h1>
+          <p className="auth-subtitle">Regístrate para comenzar a administrar el monolito</p>
+        </div>
+
+        {error && (
+          <div className="alert-error">
+            <AlertCircle size={15} />
+            <span>{error}</span>
           </div>
-          <div>
-            <label className="block text-slate-400 text-sm mb-1">Password</label>
-            <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full bg-[#1a202c] text-white px-4 py-3 rounded-xl border border-white/10 focus:outline-none focus:border-cyan-500" />
+        )}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Nombre Completo</label>
+            <div className="input-wrapper">
+              <User className="input-icon" size={16} />
+              <input 
+                type="text" 
+                required 
+                value={name} 
+                onChange={e => setName(e.target.value)} 
+                className="form-input" 
+                placeholder="Tu Nombre" 
+              />
+            </div>
           </div>
-          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:opacity-90 transition">
-            {loading ? 'Registering...' : 'Register'}
+
+          <div className="form-group">
+            <label className="form-label">Correo Electrónico</label>
+            <div className="input-wrapper">
+              <Mail className="input-icon" size={16} />
+              <input 
+                type="email" 
+                required 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                className="form-input" 
+                placeholder="usuario@dstack.com" 
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Contraseña</label>
+            <div className="input-wrapper">
+              <Lock className="input-icon" size={16} />
+              <input 
+                type="password" 
+                required 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                className="form-input" 
+                placeholder="••••••••" 
+              />
+            </div>
+          </div>
+
+          <button type="submit" disabled={loading} className="btn-primary mt-2">
+            <span>{loading ? 'Registrando...' : 'Crear Cuenta'}</span>
+            {!loading && <ArrowRight size={16} />}
           </button>
         </form>
-        <p className="text-center text-slate-400 text-sm mt-6">
-          Already have an account? <Link to="/login" className="text-cyan-400 font-semibold hover:underline">Log in</Link>
+
+        <p className="text-center text-slate-400 text-xs mt-6">
+          ¿Ya tienes cuenta? <Link to="/login" className="text-[#ffd000] font-semibold hover:underline">Iniciar Sesión</Link>
         </p>
       </div>
     </div>
