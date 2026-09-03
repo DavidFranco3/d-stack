@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import helmet from 'helmet';
@@ -39,7 +40,8 @@ app.use('/api/', limiter);
 
 // Standard Middleware
 app.use(cors());
-app.use(morgan('dev'));
+app.use(cookieParser());
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(loggerMiddleware);
 

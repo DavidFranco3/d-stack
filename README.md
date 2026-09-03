@@ -31,8 +31,9 @@
 # 1. Install CLI globally
 npm install -g @davidfranco3/dstack
 
-# 2. Scaffold a new project (TypeScript)
-dstack init my-app -t ts
+# 2. Scaffold a new project (TypeScript) and install dependencies
+#    (-i / --install installs dependencies non-interactively)
+dstack init my-app -t ts -i
 
 # 3. Start development (API :4000 + Vite :5173)
 cd my-app
@@ -47,7 +48,7 @@ npm run dev
 | :--- | :--- |
 | `dstack init [name]` | Scaffold a full-stack project (`-t ts` / `-t js`) |
 | `dstack g resource <Name>` | Generate CRUD module, auto-inject routes, and create React page with Modals, Toasts & 3-dots Dropdown |
-| `dstack g auth` | Scaffold complete Auth module & UI (`RegisterPage`, `/api/auth`) |
+| `dstack g auth` | Scaffold complete Auth module & UI (`RegisterPage`, `/register` route, `/api/auth/register \| login \| me \| logout`) |
 | `dstack remove resource <Name>` | Delete resource files and un-inject routes from `server.ts` & `App.tsx` |
 | `dstack g model\|service\|controller\|route\|middleware <Name>` | Scaffold a single layer |
 | `dstack doctor` | Check Node, npm, MongoDB, and project structure |
@@ -61,7 +62,8 @@ Creates the project structure with Express + Mongoose + Zod + Helmet + OpenAPI D
 
 ```bash
 dstack init my-app             # interactive mode
-dstack init my-app -t ts       # TypeScript, non-interactive
+dstack init my-app -t ts       # TypeScript, non-interactive (no dependency install)
+dstack init my-app -t ts -i    # TypeScript, non-interactive + install dependencies
 dstack init my-app -t js       # JavaScript, non-interactive
 ```
 
@@ -100,7 +102,16 @@ Scaffolds the full User Authentication & Account Registration flow:
 dstack g auth
 ```
 
-Creates `RegisterPage.tsx`, links `/register` in `App.tsx`, and wires up `/api/auth` endpoints.
+Creates `RegisterPage.tsx`, links `/register` in `App.tsx`, and wires up the backend auth endpoints:
+
+| Endpoint | Description |
+| :--- | :--- |
+| `POST /api/auth/register` | Create an account (sets an httpOnly session cookie) |
+| `POST /api/auth/login` | Log in with email + password (sets an httpOnly session cookie) |
+| `GET /api/auth/me` | Restore the current session user (used on app reload) |
+| `POST /api/auth/logout` | Clear the session cookie |
+
+> 🔒 The JWT lives in an **httpOnly cookie** — it is never exposed to JavaScript, protecting the token from XSS. The seed creates dev users with the default credentials `admin@dstack.com` / `12345678` (hardcoded in `api/src/config/seed.ts` — change them or hash them to your liking before going to production).
 
 ---
 
@@ -120,6 +131,8 @@ Every D-Stack project comes with built-in interactive Swagger UI documentation o
 
 * **Interactive UI:** `http://localhost:4000/api/docs`
 * **JSON Spec:** `http://localhost:4000/api/docs/json`
+
+> 📝 The OpenAPI spec at `/api/docs/json` is a static overview of the core endpoints; generated resource routes are registered in `api/src/server.ts` and are not listed in the spec automatically.
 
 ---
 

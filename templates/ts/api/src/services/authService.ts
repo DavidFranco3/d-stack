@@ -21,4 +21,25 @@ export class AuthService {
 
     return user;
   }
+
+  static async register(data: { name: string; email: string; password: string }) {
+    const existing = await User.findOne({ email: data.email });
+    if (existing) {
+      const err: any = new Error('Email is already registered');
+      err.statusCode = 409;
+      throw err;
+    }
+    const user = new User(data);
+    return await user.save();
+  }
+
+  static async getUserFromRequest(token: string | null) {
+    if (!token) return null;
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+      return await User.findById(decoded.id);
+    } catch {
+      return null;
+    }
+  }
 }

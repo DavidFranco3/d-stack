@@ -6,29 +6,49 @@ import DashboardPage from './pages/DashboardPage';
 import ResourcesPage from './pages/ResourcesPage';
 import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
+import { api } from './api/client';
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [authState, setAuthState] = useState('loading');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    api.resource('auth/me').safe().get()
+      .then((res) => {
+        if (res.ok && res.data?.user) {
+          setUser(res.data.user);
+          setAuthState('authed');
+        } else {
+          setAuthState('guest');
+        }
+      })
+      .catch(() => setAuthState('guest'));
   }, []);
 
-  const handleLogin = (newToken, newUser) => {
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    setToken(newToken);
+  const handleLogin = (newUser) => {
     setUser(newUser);
+    setAuthState('authed');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
+  const handleLogout = async () => {
+    try {
+      await api.resource('auth/logout').safe().post({});
+    } catch {
+      // Ignore logout errors
+    }
     setUser(null);
+    setAuthState('guest');
   };
+
+  if (authState === 'loading') {
+    return (
+      <div className="min-h-screen bg-[#0a0d14] flex items-center justify-center text-slate-400 text-sm">
+        Loading...
+      </div>
+    );
+  }
+
+  const isAuthed = authState === 'authed';
 
   return (
     <BrowserRouter>
@@ -36,14 +56,14 @@ function App() {
         <Route 
           path="/login" 
           element={
-            token ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />
+            isAuthed ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />
           } 
         />
         
         {/* Protected App Modules inside AppLayout */}
         <Route 
           element={
-            token ? <AppLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
+            isAuthed ? <AppLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />
           }
         >
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -55,7 +75,7 @@ function App() {
 
         <Route 
           path="*" 
-          element={<Navigate to={token ? "/dashboard" : "/login"} replace />} 
+          element={<Navigate to={isAuthed ? "/dashboard" : "/login"} replace />} 
         />
       </Routes>
     </BrowserRouter>

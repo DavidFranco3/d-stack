@@ -1,7 +1,8 @@
 {
   "name": "@davidfranco3/dstack",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A fullstack monolith framework for Express and React by David Franco",
+  "license": "ISC",
   "main": "cli/index.js",
   "bin": {
     "dstack": "./cli/index.js"

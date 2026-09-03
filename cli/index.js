@@ -29,7 +29,7 @@ const showBanner = () => {
 program
   .name('dstack')
   .description('D-Stack CLI: Generate full-stack monolith applications and components')
-  .version('1.1.0');
+  .version('1.2.0');
 
 // Initialize Command
 program
@@ -37,6 +37,7 @@ program
   .description('Initialize a new D-Stack project')
   .argument('[name]', 'Project name')
   .option('-t, --template <type>', 'Language template: ts (TypeScript) or js (JavaScript)')
+  .option('-i, --install', 'Install dependencies automatically (non-interactive mode)')
   .action(async (name, options) => {
     showBanner();
 
@@ -77,18 +78,23 @@ program
       });
     }
 
-    questions.push({
-      type: 'confirm',
-      name: 'installDeps',
-      message: 'Would you like to install dependencies automatically?',
-      default: true,
-    });
+    const nonInteractive = Boolean(name) && Boolean(language);
+
+    if (!nonInteractive) {
+      questions.push({
+        type: 'confirm',
+        name: 'installDeps',
+        message: 'Would you like to install dependencies automatically?',
+        default: true,
+      });
+    }
 
     const answers = questions.length > 0 ? await inquirer.prompt(questions) : {};
     const projectName = name || answers.projectName;
     const effectiveLanguage = language || answers.language;
     const isTS = effectiveLanguage === 'TypeScript';
     const languageFolder = isTS ? 'ts' : 'js';
+    const installDeps = nonInteractive ? Boolean(options.install) : Boolean(answers.installDeps);
 
     const targetPath = path.join(process.cwd(), projectName);
     const templatePath = path.join(__dirname, '../templates', languageFolder);
@@ -101,8 +107,18 @@ program
         process.exit(1);
       }
 
-      // Copy template
-      await fs.copy(templatePath, targetPath);
+      // Copy template (excluding heavy/generated folders like node_modules and dist)
+      await fs.copy(templatePath, targetPath, {
+        filter: (src) => {
+          const rel = path.relative(templatePath, src);
+          const parts = rel.split(path.sep);
+          return !parts.includes('node_modules')
+            && !parts.includes('dist')
+            && !parts.includes('dist-ssr')
+            && !parts.includes('.git')
+            && !parts.some((p) => p === '.env' || p.startsWith('.env.'));
+        },
+      });
 
       // Update project name in root package.json
       const packageJsonPath = path.join(targetPath, 'package.json');
@@ -113,7 +129,7 @@ program
       }
 
       // Install dependencies if requested
-      if (answers.installDeps) {
+      if (installDeps) {
         console.log(chalk.cyan(`📦 Installing dependencies for Root, API, and Web... (this may take a minute)\n`));
         shell.cd(targetPath);
 
@@ -131,7 +147,7 @@ program
       console.log(chalk.green(`\n🎉 Project ${chalk.bold(projectName)} created successfully!`));
       console.log(chalk.yellow(`\nNext steps:`));
       console.log(chalk.white(`  cd ${projectName}`));
-      if (!answers.installDeps) {
+      if (!installDeps) {
         console.log(chalk.white(`  npm run install-all`));
       }
       console.log(chalk.white(`  npm run dev\n`));
@@ -336,7 +352,8 @@ export class ${cap}Controller {
 
   static async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await ${cap}Service.getById(req.params.id);
+      const id = String(req.params.id);
+      const item = await ${cap}Service.getById(id);
       if (!item) return res.status(404).json({ message: '${cap} not found' });
       res.json(item);
     } catch (err) {
@@ -355,7 +372,8 @@ export class ${cap}Controller {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await ${cap}Service.update(req.params.id, req.body);
+      const id = String(req.params.id);
+      const item = await ${cap}Service.update(id, req.body);
       if (!item) return res.status(404).json({ message: '${cap} not found' });
       res.json(item);
     } catch (err) {
@@ -365,7 +383,8 @@ export class ${cap}Controller {
 
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const item = await ${cap}Service.delete(req.params.id);
+      const id = String(req.params.id);
+      const item = await ${cap}Service.delete(id);
       if (!item) return res.status(404).json({ message: '${cap} not found' });
       res.json({ message: '${cap} deleted successfully' });
     } catch (err) {
@@ -440,10 +459,13 @@ function generateRoute(name, isTS) {
   if (isTS) {
     return `import { Router } from 'express';
 import { ${cap}Controller } from '../controllers/${camel}Controller.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { z } from 'zod';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 const create${cap}Schema = z.object({
   body: z.object({
@@ -453,8 +475,14 @@ const create${cap}Schema = z.object({
 
 router.get('/', ${cap}Controller.getAll);
 router.get('/:id', ${cap}Controller.getById);
+const update${cap}Schema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required').optional(),
+  }),
+});
+
 router.post('/', validate(create${cap}Schema), ${cap}Controller.create);
-router.put('/:id', ${cap}Controller.update);
+router.put('/:id', validate(update${cap}Schema), ${cap}Controller.update);
 router.delete('/:id', ${cap}Controller.delete);
 
 export default router;
@@ -462,10 +490,13 @@ export default router;
   } else {
     return `import { Router } from 'express';
 import { ${cap}Controller } from '../controllers/${camel}Controller.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { z } from 'zod';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 const create${cap}Schema = z.object({
   body: z.object({
@@ -475,8 +506,14 @@ const create${cap}Schema = z.object({
 
 router.get('/', ${cap}Controller.getAll);
 router.get('/:id', ${cap}Controller.getById);
+const update${cap}Schema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required').optional(),
+  }),
+});
+
 router.post('/', validate(create${cap}Schema), ${cap}Controller.create);
-router.put('/:id', ${cap}Controller.update);
+router.put('/:id', validate(update${cap}Schema), ${cap}Controller.update);
 router.delete('/:id', ${cap}Controller.delete);
 
 export default router;
@@ -516,9 +553,11 @@ function generatePage(name, isTS) {
   const cap = name.charAt(0).toUpperCase() + name.slice(1);
   const camel = name.charAt(0).toLowerCase() + name.slice(1);
   if (isTS) {
-    return `import { useState, useEffect } from 'react';
+    return `import React, { useState, useEffect } from 'react';
 import { ApexTable, ApexTableColumn } from 'react-apextable-pro';
 import Swal from 'sweetalert2';
+import { Edit2, Trash2 } from 'lucide-react';
+import { Dropdown } from '../components/Dropdown';
 import { api } from '../api/client';
 
 interface ${cap}Item {
@@ -578,7 +617,7 @@ export default function ${cap}Page() {
     if (!nameInput.trim()) return;
 
     if (editingItem && editingItem._id) {
-      const res: any = await api.resource('${camel}s').safe().put(editingItem._id, { name: nameInput });
+      const res: any = await api.resource(\`${camel}s/\${editingItem._id}\`).safe().put({ name: nameInput });
       if (res.ok) {
         Toast.fire({ icon: 'success', title: '${cap} updated successfully!' });
         setIsModalOpen(false);
@@ -613,7 +652,7 @@ export default function ${cap}Page() {
     });
 
     if (result.isConfirmed) {
-      const res: any = await api.resource('${camel}s').safe().delete(id);
+      const res: any = await api.resource(\`${camel}s/\${id}\`).safe().delete();
       if (res.ok) {
         Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
         fetchItems();
@@ -687,6 +726,8 @@ export default function ${cap}Page() {
     return `import { useState, useEffect } from 'react';
 import { ApexTable } from 'react-apextable-pro';
 import Swal from 'sweetalert2';
+import { Edit2, Trash2 } from 'lucide-react';
+import { Dropdown } from '../components/Dropdown';
 import { api } from '../api/client';
 
 const Toast = Swal.mixin({
@@ -740,7 +781,7 @@ export default function ${cap}Page() {
     if (!nameInput.trim()) return;
 
     if (editingItem && editingItem._id) {
-      const res = await api.resource('${camel}s').safe().put(editingItem._id, { name: nameInput });
+      const res = await api.resource(\`${camel}s/\${editingItem._id}\`).safe().put({ name: nameInput });
       if (res.ok) {
         Toast.fire({ icon: 'success', title: '${cap} updated successfully!' });
         setIsModalOpen(false);
@@ -775,7 +816,7 @@ export default function ${cap}Page() {
     });
 
     if (result.isConfirmed) {
-      const res = await api.resource('${camel}s').safe().delete(id);
+      const res = await api.resource(\`${camel}s/\${id}\`).safe().delete();
       if (res.ok) {
         Toast.fire({ icon: 'success', title: '${cap} deleted successfully!' });
         fetchItems();
@@ -977,7 +1018,7 @@ function ejectWebAppRoute(webPagesDir, capitalizedName, camelName, isTS) {
 function generateRegisterPage(isTS) {
   if (isTS) {
     return `import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 
 export default function RegisterPage() {
@@ -993,13 +1034,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res: any = await api.post('/api/auth/register', { name, email, password });
-      if (res.ok && res.data?.token) {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
+      const res: any = await api.resource('auth/register').safe().post({ name, email, password });
+      if (res.ok && res.data) {
+        // The API sets an httpOnly session cookie; just enter the app.
         window.location.href = '/dashboard';
       } else {
-        setError(res.data?.message || 'Registration failed');
+        setError(res.error?.message || res.data?.message || 'Registration failed');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration');
@@ -1056,13 +1096,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await api.post('/api/auth/register', { name, email, password });
-      if (res.ok && res.data?.token) {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
+      const res = await api.resource('auth/register').safe().post({ name, email, password });
+      if (res.ok && res.data) {
+        // The API sets an httpOnly session cookie; just enter the app.
         window.location.href = '/dashboard';
       } else {
-        setError(res.data?.message || 'Registration failed');
+        setError(res.error?.message || res.data?.message || 'Registration failed');
       }
     } catch (err) {
       setError(err.message || 'An error occurred during registration');
@@ -1101,6 +1140,319 @@ export default function RegisterPage() {
   );
 }
 `;
+  }
+}
+
+// --- Auth module backend scaffolding (register / me / logout endpoints) ---
+
+function generateAuthRoutesFile(isTS) {
+  return `import { Router } from 'express';
+import { AuthController } from '../controllers/authController.js';
+import { validate } from '../middleware/validate.js';
+import { z } from 'zod';
+
+const router = Router();
+
+// Validation Schemas
+const registerSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Must be a valid email'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }),
+});
+
+const loginSchema = z.object({
+  body: z.object({
+    email: z.string().email('Must be a valid email'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }),
+});
+
+router.post('/register', validate(registerSchema), AuthController.register);
+router.post('/login', validate(loginSchema), AuthController.login);
+router.get('/me', AuthController.me);
+router.post('/logout', AuthController.logout);
+
+export default router;
+`;
+}
+
+function generateAuthControllerFile(isTS) {
+  if (isTS) {
+    return `import { Request, Response, NextFunction } from 'express';
+import { AuthService } from '../services/authService.js';
+import { logger } from '../middleware/logger.js';
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60 * 1000,
+};
+
+export class AuthController {
+  static async register(req: Request, res: Response, next: NextFunction) {
+    const { name, email, password } = req.body;
+    try {
+      const user = await AuthService.register({ name, email, password });
+      const token = await AuthService.generateToken(user);
+      res.cookie('token', token, COOKIE_OPTIONS);
+
+      res.status(201).json({
+        user: { id: user._id, name: user.name, email: user.email }
+      });
+    } catch (err) {
+      logger.error('Register error: ' + err);
+      next(err);
+    }
+  }
+
+  static async login(req: Request, res: Response, next: NextFunction) {
+    const { email, password } = req.body;
+    try {
+      const user = await AuthService.validateCredentials(email, password);
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
+      const token = await AuthService.generateToken(user);
+      res.cookie('token', token, COOKIE_OPTIONS);
+
+      res.json({
+        user: { id: user._id, name: user.name, email: user.email }
+      });
+    } catch (err) {
+      logger.error('Login error: ' + err);
+      next(err);
+    }
+  }
+
+  static async me(req: Request, res: Response, next: NextFunction) {
+    try {
+      const bearer = req.header('Authorization') || '';
+      const token = req.cookies?.token || bearer.replace(/^Bearer\\s+/, '') || null;
+      const user = await AuthService.getUserFromRequest(token);
+
+      res.json({
+        user: user ? { id: user._id, name: user.name, email: user.email } : null
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async logout(req: Request, res: Response) {
+    res.clearCookie('token', { httpOnly: true, sameSite: 'lax' as const });
+    res.json({ message: 'Logged out successfully' });
+  }
+}
+`;
+  }
+  return `import { AuthService } from '../services/authService.js';
+import { logger } from '../middleware/logger.js';
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  maxAge: 24 * 60 * 60 * 1000,
+};
+
+export class AuthController {
+  static async register(req, res, next) {
+    const { name, email, password } = req.body;
+    try {
+      const user = await AuthService.register({ name, email, password });
+      const token = await AuthService.generateToken(user);
+      res.cookie('token', token, COOKIE_OPTIONS);
+
+      res.status(201).json({
+        user: { id: user._id, name: user.name, email: user.email }
+      });
+    } catch (err) {
+      logger.error('Register error: ' + err);
+      next(err);
+    }
+  }
+
+  static async login(req, res, next) {
+    const { email, password } = req.body;
+    try {
+      const user = await AuthService.validateCredentials(email, password);
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+      }
+
+      const token = await AuthService.generateToken(user);
+      res.cookie('token', token, COOKIE_OPTIONS);
+
+      res.json({
+        user: { id: user._id, name: user.name, email: user.email }
+      });
+    } catch (err) {
+      logger.error('Login error: ' + err);
+      next(err);
+    }
+  }
+
+  static async me(req, res, next) {
+    try {
+      const bearer = req.header('Authorization') || '';
+      const token = req.cookies?.token || bearer.replace(/^Bearer\\s+/, '') || null;
+      const user = await AuthService.getUserFromRequest(token);
+
+      res.json({
+        user: user ? { id: user._id, name: user.name, email: user.email } : null
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async logout(req, res) {
+    res.clearCookie('token', { httpOnly: true, sameSite: 'lax' });
+    res.json({ message: 'Logged out successfully' });
+  }
+}
+`;
+}
+
+function generateAuthServiceFile(isTS) {
+  if (isTS) {
+    return `import jwt from 'jsonwebtoken';
+import { User, IUser } from '../models/User.js';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+export class AuthService {
+  static async generateToken(user: IUser): Promise<string> {
+    return jwt.sign(
+      { id: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+  }
+
+  static async validateCredentials(email: string, password: string) {
+    const user = await User.findOne({ email });
+    if (!user) return null;
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return null;
+
+    return user;
+  }
+
+  static async register(data: { name: string; email: string; password: string }) {
+    const existing = await User.findOne({ email: data.email });
+    if (existing) {
+      const err: any = new Error('Email is already registered');
+      err.statusCode = 409;
+      throw err;
+    }
+    const user = new User(data);
+    return await user.save();
+  }
+
+  static async getUserFromRequest(token: string | null) {
+    if (!token) return null;
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+      return await User.findById(decoded.id);
+    } catch {
+      return null;
+    }
+  }
+}
+`;
+  }
+  return `import jwt from 'jsonwebtoken';
+import { User } from '../models/User.js';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+export class AuthService {
+  static async generateToken(user) {
+    return jwt.sign(
+      { id: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+  }
+
+  static async validateCredentials(email, password) {
+    const user = await User.findOne({ email });
+    if (!user) return null;
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return null;
+
+    return user;
+  }
+
+  static async register(data) {
+    const existing = await User.findOne({ email: data.email });
+    if (existing) {
+      const err = new Error('Email is already registered');
+      err.statusCode = 409;
+      throw err;
+    }
+    const user = new User(data);
+    return await user.save();
+  }
+
+  static async getUserFromRequest(token) {
+    if (!token) return null;
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      return await User.findById(decoded.id);
+    } catch {
+      return null;
+    }
+  }
+}
+`;
+}
+
+// Ensure the backend exposes register / me / logout auth endpoints (idempotent)
+function ensureAuthBackend(apiSrcDir, isTS) {
+  const ext = isTS ? 'ts' : 'js';
+
+  const routesPath = path.join(apiSrcDir, 'routes', `authRoutes.${ext}`);
+  if (fs.existsSync(routesPath) && fs.readFileSync(routesPath, 'utf-8').includes("'/register'")) {
+    console.log(chalk.yellow(`⚠️ Auth endpoints already present in routes/authRoutes.${ext}. Skipping.`));
+  } else {
+    if (fs.existsSync(routesPath)) {
+      console.log(chalk.yellow(`⚠️ Replacing routes/authRoutes.${ext} with the standard auth module.`));
+    }
+    fs.ensureDirSync(path.join(apiSrcDir, 'routes'));
+    fs.writeFileSync(routesPath, generateAuthRoutesFile(isTS));
+    console.log(chalk.green(`✅ Auth routes ready: /api/auth/register, /login, /me, /logout`));
+  }
+
+  const controllerPath = path.join(apiSrcDir, 'controllers', `authController.${ext}`);
+  if (fs.existsSync(controllerPath) && fs.readFileSync(controllerPath, 'utf-8').includes('static async register')) {
+    console.log(chalk.yellow(`⚠️ Auth handlers already present in controllers/authController.${ext}. Skipping.`));
+  } else {
+    if (fs.existsSync(controllerPath)) {
+      console.log(chalk.yellow(`⚠️ Replacing controllers/authController.${ext} with the standard auth module.`));
+    }
+    fs.ensureDirSync(path.join(apiSrcDir, 'controllers'));
+    fs.writeFileSync(controllerPath, generateAuthControllerFile(isTS));
+    console.log(chalk.green(`✅ Auth controller ready: register, login, me, logout`));
+  }
+
+  const servicePath = path.join(apiSrcDir, 'services', `authService.${ext}`);
+  if (fs.existsSync(servicePath) && fs.readFileSync(servicePath, 'utf-8').includes('static async getUserFromRequest')) {
+    console.log(chalk.yellow(`⚠️ Auth service already up to date in services/authService.${ext}. Skipping.`));
+  } else {
+    if (fs.existsSync(servicePath)) {
+      console.log(chalk.yellow(`⚠️ Replacing services/authService.${ext} with the standard auth module.`));
+    }
+    fs.ensureDirSync(path.join(apiSrcDir, 'services'));
+    fs.writeFileSync(servicePath, generateAuthServiceFile(isTS));
+    console.log(chalk.green(`✅ Auth service ready: validateCredentials, register, generateToken, getUserFromRequest`));
   }
 }
 
@@ -1172,13 +1524,16 @@ program
             "import Login from './pages/Login';\nimport RegisterPage from './pages/RegisterPage';"
           );
           appContent = appContent.replace(
-            '<Route \n          path="/login"',
-            '<Route path="/register" element={<RegisterPage />} />\n        <Route \n          path="/login"'
+            /<Route\s+path=["']\/login["']/,
+            (match) => `<Route path="/register" element={<RegisterPage />} />\n        ${match}`
           );
           fs.writeFileSync(appPath, appContent);
           console.log(chalk.green(`✅ Auto-registered /register route in App.${webExt}`));
         }
       }
+
+      // Ensure the backend exposes /api/auth/register, /me and /logout
+      ensureAuthBackend(apiSrcDir, isTS);
 
       console.log(chalk.green(`\n🎉 Auth Module successfully scaffolded!\n`));
       return;
@@ -1273,6 +1628,33 @@ program
     const webExt = isTS ? 'tsx' : 'jsx';
 
     const normalizedType = type.toLowerCase();
+    if (normalizedType === 'auth') {
+      const regPagePath = path.join(webPagesDir, `RegisterPage.${webExt}`);
+      if (fs.existsSync(regPagePath)) {
+        fs.removeSync(regPagePath);
+        console.log(chalk.red(`🗑️ Removed: ${path.relative(process.cwd(), regPagePath)}`));
+      }
+
+      const webSrcDir = path.dirname(webPagesDir);
+      const appPathTS = path.join(webSrcDir, 'App.tsx');
+      const appPathJS = path.join(webSrcDir, 'App.jsx');
+      const appPath = fs.existsSync(appPathTS) ? appPathTS : (fs.existsSync(appPathJS) ? appPathJS : null);
+
+      if (appPath) {
+        let appContent = fs.readFileSync(appPath, 'utf-8');
+        const importPattern = /import\s+RegisterPage\s+from\s+['"]\.\/pages\/RegisterPage['"];?\r?\n?/g;
+        const routePattern = /<Route\s+path=["']\/register["']\s+element={<RegisterPage\s*\/>}\s*\/?>\s*\r?\n?/g;
+        const updated = appContent.replace(importPattern, '').replace(routePattern, '');
+        if (updated !== appContent) {
+          fs.writeFileSync(appPath, updated);
+          console.log(chalk.green(`✅ Un-registered /register route in App.${webExt}`));
+        }
+      }
+
+      console.log(chalk.green(`\n✅ Auth module removed successfully!\n`));
+      return;
+    }
+
     if (normalizedType === 'resource' || normalizedType === 'res') {
       if (!name) {
         console.error(chalk.red('❌ Resource name is required to remove.'));
@@ -1300,7 +1682,11 @@ program
       ejectWebAppRoute(webPagesDir, cap, camel, isTS);
 
       console.log(chalk.green(`\n✅ Resource "${cap}" removed successfully!\n`));
+      return;
     }
+
+    console.error(chalk.red(`❌ Invalid type "${type}". Allowed types: resource, auth`));
+    process.exit(1);
   });
 
 // Doctor Command

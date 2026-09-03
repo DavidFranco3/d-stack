@@ -1,15 +1,17 @@
 import { FluentRestClient } from 'fluent-rest-client';
 
 /**
- * Pre-configured FluentRestClient instance for D-Stack Web
+ * Pre-configured FluentRestClient instance for D-Stack Web.
+ *
+ * Authentication is handled with an httpOnly cookie set by the API,
+ * so no token is stored in localStorage (XSS-safe).
  */
 export const api = new FluentRestClient('/api', {
-  onGetToken: async () => localStorage.getItem('token'),
-  onSaveToken: async (token) => localStorage.setItem('token', token),
   onAuthError: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.reload();
+    // Session expired — redirect to login (avoid loops when already there)
+    if (!window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login';
+    }
   },
 });
 

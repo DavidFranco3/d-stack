@@ -4,12 +4,12 @@ import { Rocket, Mail, Lock, ChevronRight, AlertCircle } from 'lucide-react';
 import { api } from '../api/client';
 
 interface LoginProps {
-  onLogin: (token: string, user: any) => void;
+  onLogin: (user: { name: string; email: string }) => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
-  const [email, setEmail] = useState('admin@dstack.com');
-  const [password, setPassword] = useState('12345678');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +22,7 @@ export default function Login({ onLogin }: LoginProps) {
       const res: any = await api.resource('auth/login').safe().post({ email, password });
 
       if (res.ok && res.data) {
-        onLogin(res.data.token, res.data.user);
+        onLogin(res.data.user);
       } else {
         setError(res.error?.message || res.data?.message || 'Credenciales inválidas');
       }
@@ -62,7 +62,7 @@ export default function Login({ onLogin }: LoginProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="form-input"
-                placeholder="admin@dstack.com"
+                placeholder="tucorreo@ejemplo.com"
                 required
               />
             </div>
@@ -103,12 +103,6 @@ export default function Login({ onLogin }: LoginProps) {
             {!loading && <ChevronRight size={18} />}
           </button>
         </form>
-
-        <div className="auth-credentials-box">
-          <p className="auth-credentials-text">
-            Admin por defecto: <span className="auth-credential-chip">admin@dstack.com</span> / <span className="auth-credential-chip">12345678</span>
-          </p>
-        </div>
       </motion.div>
     </div>
   );

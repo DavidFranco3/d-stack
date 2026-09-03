@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  cli-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  scaffold-and-api-tests:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Scaffold project and generate a resource
+        run: |
+          node cli/index.js init ci-app -t ts
+          cd ci-app
+          node ../cli/index.js g resource Product
+          npm --prefix api install --no-audit --no-fund
+          npm --prefix web install --no-audit --no-fund
+      - name: Build web + API (verifies generated code compiles)
+        run: cd ci-app && npm run build
+      - name: Run runtime API tests against MongoDB
+        run: cd ci-app/api && npx vitest run
