@@ -147,11 +147,12 @@ D-Stack System Diagnostic...
         <ul class="cmd-list">
           <li><code>[project-name]</code> (optional): Directory and package name. Prompts if omitted.</li>
           <li><code>-t, --template &lt;ts|js&gt;</code>: Language selection for non-interactive mode.</li>
+          <li><code>-i, --install</code>: Install dependencies automatically (non-interactive mode).</li>
         </ul>
 
         <div class="cmd-subtitle">Examples:</div>
         <div class="code-block">
-          <code># Interactive<br>dstack init my-app<br><br># Non-interactive with TypeScript<br>dstack init my-app -t ts</code>
+          <code># Interactive<br>dstack init my-app<br><br># Non-interactive TypeScript + auto-install<br>dstack init my-app -t ts -i</code>
         </div>
 
         <div class="cmd-subtitle">Generated Structure:</div>
@@ -218,29 +219,29 @@ D-Stack System Diagnostic...
         <div class="cmd-subtitle">Files Created & Auto-Injected:</div>
         <div class="cmd-tree">1. Page:   web/src/pages/RegisterPage.tsx
 2. Route:  Auto-registered /register in App.tsx
-3. Endpoints: /api/auth/register & /api/auth/login</div>
+3. Endpoints: /api/auth/register, /login, /me & /logout (httpOnly cookie sessions)</div>
       </div>
     `,
 
     remove: `
       <div class="cmd-header">
         <div class="cmd-tag">Cleanup Utility</div>
-        <h3 class="cmd-title"><code>dstack remove resource &lt;Name&gt;</code></h3>
+        <h3 class="cmd-title"><code>dstack remove &lt;resource|auth&gt; [Name]</code></h3>
       </div>
       <p class="cmd-desc">
-        Safely deletes all generated files for a resource and automatically un-injects imports and routes from server.ts and App.tsx.
+        Safely deletes generated files and automatically un-injects imports and routes from server.ts and App.tsx. Supports both resources and the auth module.
       </p>
 
       <div class="cmd-details">
-        <div class="cmd-subtitle">Aliases:</div>
+        <div class="cmd-subtitle">Commands & Aliases:</div>
         <ul class="cmd-list">
-          <li><code>dstack remove resource &lt;Name&gt;</code></li>
-          <li><code>dstack rm resource &lt;Name&gt;</code></li>
+          <li><code>dstack remove resource &lt;Name&gt;</code> (alias: <code>dstack rm resource &lt;Name&gt;</code>)</li>
+          <li><code>dstack remove auth</code> (alias: <code>dstack rm auth</code>)</li>
         </ul>
 
-        <div class="cmd-subtitle">Example:</div>
+        <div class="cmd-subtitle">Examples:</div>
         <div class="code-block">
-          <code>dstack rm resource Product</code>
+          <code>dstack rm resource Product<br>dstack rm auth</code>
         </div>
       </div>
     `,
